@@ -212,6 +212,9 @@
 				transform = transform.Scale(1.005, 1.005)
 				name = "[initial(name)] of sentient slaying +[num_sentient_mobs_hit]"
 
+		aas_config_announce(/datum/aas_config_entry/station_trait/rod_accident, list("UNLUCKY" = smeared_mob, "SRC" = src), src, list(RADIO_CHANNEL_COMMON))
+
+
 	smeared_mob.apply_damage(100, BRUTE, spread_damage = TRUE)
 	smeared_mob.apply_damage(60, BRUTE, BODY_ZONE_CHEST, wound_bonus = 20, sharpness = SHARP_POINTY)
 

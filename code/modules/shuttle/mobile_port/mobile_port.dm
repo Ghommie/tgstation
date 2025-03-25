@@ -325,7 +325,7 @@
 	invertTimer()
 	mode = SHUTTLE_RECALL
 
-/obj/docking_port/mobile/proc/enterTransit()
+/obj/docking_port/mobile/proc/enterTransit(from_emergency_shuttle = FALSE)
 	if((SSshuttle.lockdown && is_station_level(z)) || !canMove()) //emp went off, no escape
 		mode = SHUTTLE_IDLE
 		return
@@ -338,14 +338,18 @@
 	if(S1)
 		if(initiate_docking(S1) != DOCKING_SUCCESS)
 			WARNING("shuttle \"[shuttle_id]\" could not enter transit space. Docked at [S0 ? S0.shuttle_id : "null"]. Transit dock [S1 ? S1.shuttle_id : "null"].")
-		else if(S0)
-			if(S0.delete_after)
-				qdel(S0, TRUE)
-			else
-				previous = S0
+		else
+			on_entered_transit(from_emergency_shuttle)
+			if(S0)
+				if(S0.delete_after)
+					qdel(S0, TRUE)
+				else
+					previous = S0
 	else
 		WARNING("shuttle \"[shuttle_id]\" could not enter transit space. S0=[S0 ? S0.shuttle_id : "null"] S1=[S1 ? S1.shuttle_id : "null"]")
 
+/obj/docking_port/mobile/proc/on_entered_transit(from_emergency_shuttle = FALSE)
+	return
 
 /obj/docking_port/mobile/proc/jumpToNullSpace()
 	// Destroys the docking port and the shuttle contents.
@@ -758,7 +762,7 @@
 /obj/docking_port/mobile/proc/on_emergency_launch()
 	if(launch_status == UNLAUNCHED) //Pods will not launch from the mine/planet, and other ships won't launch unless we tell them to.
 		launch_status = ENDGAME_LAUNCHED
-		enterTransit()
+		enterTransit(from_emergency_shuttle = TRUE)
 
 ///Let people know shits about to go down
 /obj/docking_port/mobile/proc/announce_shuttle_events()

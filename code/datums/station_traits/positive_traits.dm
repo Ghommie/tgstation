@@ -427,3 +427,10 @@
 	var/advisory_string = "Advisory Level: <b>Grey Sky</b></center><BR>"
 	advisory_string += "Your sector's advisory level is Grey Sky. Our sensors detect abnormal activity among the assistants assigned to your station. We advise you to closely monitor the Tool Storage, Bridge, Tech Storage, and Brig for gathering crowds or petty thievery."
 	return advisory_string
+
+/datum/station_trait/announcement_system_plus
+	name = "Announcement System Plus"
+	report_message = "Following a recent telecomms-related meeting, we have decided to allocate more funds to improve your station's Automated Announcement System. Enjoy."
+	trait_type = STATION_TRAIT_POSITIVE
+	trait_to_give = STATION_TRAIT_ANNOUNCEMENT_SYSTEM_PLUS
+	show_in_report = TRUE

@@ -281,6 +281,7 @@
 	nom.visible_message(vis_msg, mob_msg, span_hear("You hear an unearthly noise as a wave of heat washes over you."))
 	atom_source.investigate_log("has been attacked ([cause]) by [key_name(nom)]", INVESTIGATE_ENGINE)
 	add_memory_in_range(atom_source, 7, /datum/memory/witness_supermatter_dusting, protagonist = nom, antagonist = atom_source)
+	aas_config_announce(/datum/aas_config_entry/station_trait/sm_sacrifice, list("IDIOT" = nom, "SM" = source), source, list(RADIO_CHANNEL_COMMON))
 	playsound(get_turf(atom_source), 'sound/effects/supermatter.ogg', 50, TRUE)
 	consume(atom_source, nom)
 

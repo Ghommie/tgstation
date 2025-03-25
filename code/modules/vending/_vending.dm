@@ -892,6 +892,7 @@ GLOBAL_LIST_EMPTY(vending_machines_to_restock)
 				playsound(living_target, 'sound/effects/splat.ogg', 50, TRUE)
 				post_crush_living(living_target, was_alive)
 				flags_to_return |= (SUCCESSFULLY_CRUSHED_MOB|SUCCESSFULLY_CRUSHED_ATOM)
+				aas_config_announce(/datum/aas_config_entry/station_trait/vending_crush, list("ASSISTANT" = living_target, "SRC" = src, "AREA" = get_area(src)), src, list(RADIO_CHANNEL_COMMON))
 
 			else if(check_atom_crushable(atom_target))
 				atom_target.take_damage(adjusted_damage, damage_type, damage_flag, FALSE, crush_dir)

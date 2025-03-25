@@ -78,6 +78,7 @@ GLOBAL_VAR_INIT(chicks_from_eggs, 0)
 /obj/item/food/egg/proc/spawn_impact_chick(turf/spawn_turf)
 	var/chickens_remaining = MAX_CHICKENS - GLOB.chicks_from_eggs
 	if (chickens_remaining < 1)
+		aas_config_announce(/datum/aas_config_entry/station_trait/too_many_critters, list("CRITTERS" = "chickens"), src, list(RADIO_CHANNEL_COMMON))
 		return
 	var/spawned_chickens = prob(97) ? 1 : min(4, chickens_remaining) // We don't want to go over the limit
 	if (spawned_chickens > 1) // Chicken jackpot!

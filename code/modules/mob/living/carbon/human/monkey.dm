@@ -10,6 +10,7 @@
 		if (LAZYLEN(SSmobs.cubemonkeys) > cap)
 			if (spawner)
 				to_chat(spawner, span_warning("Bluespace harmonics prevent the spawning of more than [cap] monkeys on the station at one time!"))
+			aas_config_announce(/datum/aas_config_entry/station_trait/too_many_critters, list("CRITTERS" = "monkeys"), src, list(RADIO_CHANNEL_COMMON))
 			return INITIALIZE_HINT_QDEL
 		SSmobs.cubemonkeys += src
 	return ..()

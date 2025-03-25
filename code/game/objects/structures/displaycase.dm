@@ -28,6 +28,8 @@
 	var/datum/alarm_handler/alarm_manager
 	///Used for subtypes that have a UI in them. The examine on click while adjecent will not fire, as we already get a popup
 	var/autoexamine_while_closed = TRUE
+	///If both this and the Automated Announcement System Plus trait are yp, this is the channel where the radio message will be sent.
+	var/aas_alert_channel
 
 /datum/armor/structure_displaycase
 	melee = 30
@@ -103,6 +105,8 @@
 		return
 	var/area/alarmed = get_area(src)
 	alarmed.burglaralert(src)
+	if(aas_alert_channel)
+		aas_config_announce(/datum/aas_config_entry/station_trait/displaycase_destroyed, list("CASE" = src, "AREA" = alarmed), src, list(aas_alert_channel))
 
 	alarm_manager.send_alarm(ALARM_BURGLAR)
 	addtimer(CALLBACK(alarm_manager, TYPE_PROC_REF(/datum/alarm_handler, clear_alarm), ALARM_BURGLAR), 1 MINUTES)
@@ -316,12 +320,14 @@
 /obj/structure/displaycase/captain
 	start_showpiece_type = /obj/item/gun/energy/laser/captain
 	req_access = list(ACCESS_CENT_SPECOPS) //this was intentional, presumably to make it slightly harder for caps to grab their gun roundstart
+	aas_alert_channel = RADIO_CHANNEL_COMMON //let it be know that the captain is a comdom
 
 /obj/structure/displaycase/labcage
 	name = "lab cage"
 	desc = "A glass lab container for storing interesting creatures."
 	start_showpiece_type = /obj/item/clothing/mask/facehugger/lamarr
 	req_access = list(ACCESS_RD)
+	aas_alert_channel = RADIO_CHANNEL_SCIENCE
 
 /obj/structure/displaycase/noalert
 	alert = FALSE
@@ -331,6 +337,7 @@
 	desc = "Store your trophies of accomplishment in here, and they will stay forever."
 	integrity_failure = 0
 	req_access = list(ACCESS_LIBRARY)
+	aas_alert_channel = RADIO_CHANNEL_SERVICE
 	autoexamine_while_closed = FALSE
 	///the key of the player who placed the item in the case
 	var/placer_key = ""

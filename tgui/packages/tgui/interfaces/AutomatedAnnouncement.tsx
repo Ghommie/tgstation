@@ -16,7 +16,7 @@ import { Window } from '../layouts';
 
 type AASConfigEntry = {
   name: string;
-  entryRef: string;
+  entryPath: string;
   enabled: BooleanLike;
   modifiable: BooleanLike;
   announcementLinesMap: Record<string, string>;
@@ -84,7 +84,7 @@ export const AutomatedAnnouncement = (props) => {
               <Section fill scrollable>
                 {sorted.map((entry, index) => (
                   <Section
-                    key={entry.entryRef}
+                    key={entry.entryPath}
                     title={entry.name}
                     buttons={
                       <>
@@ -113,7 +113,7 @@ export const AutomatedAnnouncement = (props) => {
                               : undefined
                           }
                           onClick={() =>
-                            act('Toggle', { entryRef: entry.entryRef })
+                            act('Toggle', { entryPath: entry.entryPath })
                           }
                         >
                           {entry.enabled ? 'On' : 'Off'}
@@ -130,13 +130,13 @@ export const AutomatedAnnouncement = (props) => {
                             </Table.Cell>
                             <Table.Cell>
                               <Input
-                                key={entry.entryRef + lineKey}
+                                key={entry.entryPath + lineKey}
                                 fluid
                                 value={announcementLine}
                                 disabled={!entry.modifiable}
                                 onChange={(e, value) =>
                                   act('Text', {
-                                    entryRef: entry.entryRef,
+                                    entryPath: entry.entryPath,
                                     lineKey,
                                     newText: value,
                                   })

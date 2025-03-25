@@ -16,6 +16,10 @@
 		launch_status = EARLY_LAUNCHED
 		return ..()
 
+/obj/docking_port/mobile/pod/on_entered_transit(from_emergency_shuttle = FALSE)
+	if(!from_emergency_shuttle)
+		aas_config_announce(/datum/aas_config_entry/station_trait/emergency_pod_launch, list("SHUTTLE" = name), null, list(RADIO_CHANNEL_COMMON))
+
 /obj/docking_port/mobile/pod/cancel()
 	return
 
