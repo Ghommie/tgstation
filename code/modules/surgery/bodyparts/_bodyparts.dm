@@ -223,8 +223,8 @@
 	/// What items we drop whenever we're butchered
 	/// If unset, the bodyparot cannot be butchered
 	var/list/butcher_drops = null
-	/// What skeleton limb, if any, we replace ourselves with when butchered?
-	var/obj/item/bodypart/butcher_replacement = null
+	/// the skeletonized version of this limb, used in butchering, electrocution images, as well as being turned into a skeleton.
+	var/obj/item/bodypart/skeleton_part = null
 	/// How much meat do we add to butcher_drops when automatically generating them from our species datum?
 	var/base_meat_amount = 1
 	/// Init cache for our butcher drops for sanic speed

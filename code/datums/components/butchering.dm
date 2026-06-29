@@ -168,7 +168,7 @@
 	if (target.body_zone == BODY_ZONE_CHEST && target.owner)
 		// Cannot butcher the chest until we hack off all the other limbs
 		for (var/obj/item/bodypart/limb as anything in target.owner.get_bodyparts())
-			if (limb != target && limb.butcher_drops && limb.butcher_replacement)
+			if (limb != target && limb.butcher_drops && limb.skeleton_part)
 				to_chat(user, span_warning("You need to butcher all other limbs first!"))
 				return
 
@@ -273,7 +273,8 @@
 	user.visible_message(span_warning("[user] butchers [limb_descriptor]!"), span_notice("You butcher [limb_descriptor]."), ignored_mobs = target.owner)
 	if (!target.owner)
 		target.drop_organs(violent_removal = TRUE) // Should not happen, but just in case
-		create_replacement_limb(target, drop_loc)
+		if (target.skeleton_part)
+			create_replacement_limb(target, drop_loc)
 		qdel(target)
 		return
 
@@ -292,7 +293,7 @@
 	to_chat(target.owner, span_userdanger("[user] hacks the meat off your [target.plaintext_zone]!"))
 	var/mob/living/carbon/victim = target.owner
 
-	if (!target.butcher_replacement)
+	if (!target.skeleton_part)
 		target.dismember(source.damtype, wound_type)
 		target.drop_organs(violent_removal = TRUE) // Should not happen, but just in case
 		qdel(target)
@@ -302,12 +303,16 @@
 	target.dismember(source.damtype, wound_type)
 	target.drop_organs(violent_removal = TRUE)
 	replacement.replace_limb(victim)
+	if(replacement.body_part == CHEST)
+		// Treat people with bone chests as husks for all purposes for now
+		// Ideally husking should be per-bodypart but this simplifies a lot of behaviors
+		victim.become_husk(SKELETON_TRAIT)
 	replacement.update_limb(is_creating = TRUE)
 	qdel(target)
 
 /// Creates a replacement (usually skeleton) limb for the butchered one
 /datum/component/butchering/proc/create_replacement_limb(obj/item/bodypart/target, drop_loc)
-	var/drop_type = target.butcher_replacement
+	var/drop_type = target.skeleton_part
 	var/obj/item/bodypart/replacement = new drop_type(drop_loc)
 	replacement.bodyshape = target.bodyshape
 	replacement.set_initial_damage(target.brute_dam, target.burn_dam)
@@ -317,6 +322,11 @@
 	for (var/datum/wound/wound as anything in target.wounds)
 		wound.remove_wound()
 		wound.apply_wound(replacement, silent = TRUE)
+
+	// These parts are non-functional and bloodied up
+	replacement.disabling_threshold_percentage = 0
+	replacement.bodypart_disabled = TRUE
+	replacement.AddElement(/datum/element/blood_limb_overlay)
 
 	SEND_SIGNAL(target, COMSIG_BODYPART_BUTCHERED, replacement)
 	return replacement

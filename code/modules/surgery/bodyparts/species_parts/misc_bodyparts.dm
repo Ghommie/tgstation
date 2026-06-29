@@ -91,7 +91,7 @@
 	dmg_overlay_type = null
 	burn_modifier = 0.5 // = 1/2x generic burn damage
 	head_flags = HEAD_EYECOLOR | HEAD_EYESPRITES | HEAD_HAIR | HEAD_FACIAL_HAIR
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/chest/jelly
 	biological_state = (BIO_FLESH|BIO_BLOODED)
@@ -100,7 +100,7 @@
 	dmg_overlay_type = null
 	burn_modifier = 0.5 // = 1/2x generic burn damage
 	wing_types = list(/obj/item/organ/wings/functional/slime)
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/chest/jelly/get_butt_sprite()
 	return icon('icons/mob/butts.dmi', BUTT_SPRITE_SLIME)
@@ -110,28 +110,28 @@
 	limb_id = SPECIES_JELLYPERSON
 	dmg_overlay_type = null
 	burn_modifier = 0.5 // = 1/2x generic burn damage
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/arm/right/jelly
 	biological_state = (BIO_FLESH|BIO_BLOODED)
 	limb_id = SPECIES_JELLYPERSON
 	dmg_overlay_type = null
 	burn_modifier = 0.5 // = 1/2x generic burn damage
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/leg/left/jelly
 	biological_state = (BIO_FLESH|BIO_BLOODED)
 	limb_id = SPECIES_JELLYPERSON
 	dmg_overlay_type = null
 	burn_modifier = 0.5 // = 1/2x generic burn damage
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/leg/right/jelly
 	biological_state = (BIO_FLESH|BIO_BLOODED)
 	limb_id = SPECIES_JELLYPERSON
 	dmg_overlay_type = null
 	burn_modifier = 0.5 // = 1/2x generic burn damage
-	butcher_replacement = null
+	skeleton_part = null
 
 ///SLIME
 /obj/item/bodypart/head/jelly/slime
@@ -285,6 +285,7 @@
 	head_flags = HEAD_EYESPRITES|HEAD_EYEHOLES|HEAD_DEBRAIN
 	teeth_count = 0
 	bodypart_traits = list(TRAIT_ANTENNAE)
+	skeleton_part = /obj/item/bodypart/head/skeleton/bug
 
 /obj/item/bodypart/chest/fly
 	limb_id = SPECIES_FLYPERSON
@@ -296,18 +297,22 @@
 /obj/item/bodypart/arm/left/fly
 	limb_id = SPECIES_FLYPERSON
 	should_draw_greyscale = FALSE
+	skeleton_part = /obj/item/bodypart/arm/left/skeleton/bug
 
 /obj/item/bodypart/arm/right/fly
 	limb_id = SPECIES_FLYPERSON
 	should_draw_greyscale = FALSE
+	skeleton_part = /obj/item/bodypart/arm/right/skeleton/bug
 
 /obj/item/bodypart/leg/left/fly
 	limb_id = SPECIES_FLYPERSON
 	should_draw_greyscale = FALSE
+	skeleton_part = /obj/item/bodypart/leg/left/skeleton/bug
 
 /obj/item/bodypart/leg/right/fly
 	limb_id = SPECIES_FLYPERSON
 	should_draw_greyscale = FALSE
+	skeleton_part = /obj/item/bodypart/leg/right/skeleton/bug
 
 ///SHADOW
 /obj/item/bodypart/head/shadow
@@ -372,6 +377,8 @@
 
 ///SKELETON
 /obj/item/bodypart/head/skeleton
+	icon = 'icons/mob/human/skeleton_bodyparts.dmi'
+	icon_static = 'icons/mob/human/skeleton_bodyparts.dmi'
 	biological_state = BIO_BONE
 	limb_id = SPECIES_SKELETON
 	is_dimorphic = FALSE
@@ -380,120 +387,7 @@
 	head_flags = NONE
 	bodypart_flags = BODYPART_UNHUSKABLE
 	scarrable = FALSE
-	butcher_replacement = null
-
-/obj/item/bodypart/chest/skeleton
-	biological_state = BIO_BONE
-	limb_id = SPECIES_SKELETON
-	is_dimorphic = FALSE
-	should_draw_greyscale = FALSE
-	dmg_overlay_type = null
-	bodypart_flags = BODYPART_UNHUSKABLE
-	wing_types = list(/obj/item/organ/wings/functional/skeleton)
-	scarrable = FALSE
-	butcher_replacement = null
-
-/obj/item/bodypart/arm/left/skeleton
-	biological_state = (BIO_BONE|BIO_JOINTED)
-	limb_id = SPECIES_SKELETON
-	should_draw_greyscale = FALSE
-	dmg_overlay_type = null
-	bodypart_flags = BODYPART_UNHUSKABLE
-	scarrable = FALSE
-	butcher_replacement = null
-
-/obj/item/bodypart/arm/right/skeleton
-	biological_state = (BIO_BONE|BIO_JOINTED)
-	limb_id = SPECIES_SKELETON
-	should_draw_greyscale = FALSE
-	dmg_overlay_type = null
-	bodypart_flags = BODYPART_UNHUSKABLE
-	scarrable = FALSE
-	butcher_replacement = null
-
-/obj/item/bodypart/leg/left/skeleton
-	biological_state = (BIO_BONE|BIO_JOINTED)
-	limb_id = SPECIES_SKELETON
-	should_draw_greyscale = FALSE
-	dmg_overlay_type = null
-	bodypart_flags = BODYPART_UNHUSKABLE
-	scarrable = FALSE
-	butcher_replacement = null
-
-/obj/item/bodypart/leg/right/skeleton
-	biological_state = (BIO_BONE|BIO_JOINTED)
-	limb_id = SPECIES_SKELETON
-	should_draw_greyscale = FALSE
-	dmg_overlay_type = null
-	bodypart_flags = BODYPART_UNHUSKABLE
-	scarrable = FALSE
-	butcher_replacement = null
-
-/// Degloved bone "limbs"
-/obj/item/bodypart/head/skeleton/nonfunctional
-	limb_id = BODYPART_ID_BONE
-	// These are always disabled
-	disabling_threshold_percentage = 0
-	bodypart_disabled = TRUE
-
-/obj/item/bodypart/head/skeleton/nonfunctional/Initialize(mapload)
-	. = ..()
-	AddElement(/datum/element/blood_limb_overlay)
-
-/obj/item/bodypart/chest/skeleton/nonfunctional
-	limb_id = BODYPART_ID_BONE
-	disabling_threshold_percentage = 0
-	bodypart_disabled = TRUE
-
-/obj/item/bodypart/chest/skeleton/nonfunctional/Initialize(mapload)
-	. = ..()
-	AddElement(/datum/element/blood_limb_overlay)
-
-/obj/item/bodypart/chest/skeleton/nonfunctional/on_adding(mob/living/carbon/new_owner)
-	. = ..()
-	// Treat people with bone chests as husks for all purposes for now
-	// Ideally husking should be per-bodypart but this simplifies a lot of behaviors
-	new_owner.become_husk(SKELETON_TRAIT)
-
-/obj/item/bodypart/chest/skeleton/nonfunctional/on_removal(mob/living/carbon/old_owner)
-	. = ..()
-	old_owner.cure_husk(SKELETON_TRAIT)
-
-/obj/item/bodypart/arm/left/skeleton/nonfunctional
-	limb_id = BODYPART_ID_BONE
-	disabling_threshold_percentage = 0
-	bodypart_disabled = TRUE
-
-/obj/item/bodypart/arm/left/skeleton/nonfunctional/Initialize(mapload)
-	. = ..()
-	AddElement(/datum/element/blood_limb_overlay)
-
-/obj/item/bodypart/arm/right/skeleton/nonfunctional
-	limb_id = BODYPART_ID_BONE
-	disabling_threshold_percentage = 0
-	bodypart_disabled = TRUE
-
-/obj/item/bodypart/arm/right/skeleton/nonfunctional/Initialize(mapload)
-	. = ..()
-	AddElement(/datum/element/blood_limb_overlay)
-
-/obj/item/bodypart/leg/left/skeleton/nonfunctional
-	limb_id = BODYPART_ID_BONE
-	disabling_threshold_percentage = 0
-	bodypart_disabled = TRUE
-
-/obj/item/bodypart/leg/left/skeleton/nonfunctional/Initialize(mapload)
-	. = ..()
-	AddElement(/datum/element/blood_limb_overlay)
-
-/obj/item/bodypart/leg/right/skeleton/nonfunctional
-	limb_id = BODYPART_ID_BONE
-	disabling_threshold_percentage = 0
-	bodypart_disabled = TRUE
-
-/obj/item/bodypart/leg/right/skeleton/nonfunctional/Initialize(mapload)
-	. = ..()
-	AddElement(/datum/element/blood_limb_overlay)
+	skeleton_part = null
 
 ///MUSHROOM
 /obj/item/bodypart/head/mushroom
@@ -502,6 +396,7 @@
 	burn_modifier = 1.25
 	head_flags = NONE
 	teeth_count = 0
+	skeleton_part = /obj/item/bodypart/head/skeleton/mushroom
 
 /obj/item/bodypart/chest/mushroom
 	limb_id = SPECIES_MUSHROOM
@@ -509,6 +404,7 @@
 	bodypart_traits = list(TRAIT_NO_JUMPSUIT)
 	burn_modifier = 1.25
 	wing_types = null
+	skeleton_part = /obj/item/bodypart/chest/skeleton/mushroom
 
 /obj/item/bodypart/arm/left/mushroom
 	limb_id = SPECIES_MUSHROOM
@@ -516,6 +412,7 @@
 	unarmed_damage_high = 14
 	unarmed_effectiveness = 15
 	burn_modifier = 1.25
+	skeleton_part = /obj/item/bodypart/arm/right/skeleton/mushroom
 
 /obj/item/bodypart/arm/right/mushroom
 	limb_id = SPECIES_MUSHROOM
@@ -523,6 +420,7 @@
 	unarmed_damage_high = 14
 	unarmed_effectiveness = 15
 	burn_modifier = 1.25
+	skeleton_part = /obj/item/bodypart/arm/right/skeleton/mushroom
 
 /obj/item/bodypart/leg/left/mushroom
 	limb_id = SPECIES_MUSHROOM
@@ -531,6 +429,7 @@
 	unarmed_effectiveness = 20
 	burn_modifier = 1.25
 	speed_modifier = 0.75
+	skeleton_part = /obj/item/bodypart/leg/left/skeleton/mushroom
 
 /obj/item/bodypart/leg/right/mushroom
 	limb_id = SPECIES_MUSHROOM
@@ -539,6 +438,7 @@
 	unarmed_effectiveness = 20
 	burn_modifier = 1.25
 	speed_modifier = 0.75
+	skeleton_part = /obj/item/bodypart/leg/right/skeleton/mushroom
 
 /// Dullahan head preserves organs inside it
 /obj/item/bodypart/head/dullahan
@@ -577,7 +477,7 @@
 	teeth_count = 0
 	brute_modifier = 0.5
 	burn_modifier = 0.5
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/head/golem/Initialize(mapload)
 	worn_ears_offset = new(
@@ -620,7 +520,7 @@
 	wing_types = null
 	brute_modifier = 0.5
 	burn_modifier = 0.5
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/chest/golem/Initialize(mapload)
 	worn_belt_offset = new(
@@ -646,7 +546,7 @@
 	unarmed_effectiveness = 20
 	brute_modifier = 0.5
 	burn_modifier = 0.5
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/arm/left/golem/Initialize(mapload)
 	held_hand_offset =  new(
@@ -683,7 +583,7 @@
 	unarmed_effectiveness = 20
 	brute_modifier = 0.5
 	burn_modifier = 0.5
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/arm/right/golem/Initialize(mapload)
 	held_hand_offset =  new(
@@ -719,7 +619,7 @@
 	unarmed_effectiveness = 25
 	brute_modifier = 0.5
 	burn_modifier = 0.5
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/leg/right/golem
 	icon = 'icons/mob/human/species/golems.dmi'

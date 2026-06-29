@@ -8,6 +8,7 @@
 	head_flags = HEAD_LIPS|HEAD_EYESPRITES|HEAD_EYEHOLES|HEAD_DEBRAIN //what the fuck, moths have lips?
 	teeth_count = 0
 	bodypart_traits = list(TRAIT_ANTENNAE)
+	skeleton_part = /obj/item/bodypart/head/skeleton/bug
 
 /obj/item/bodypart/chest/moth
 	icon = 'icons/mob/human/species/moth/bodyparts.dmi'
@@ -35,6 +36,7 @@
 	unarmed_attack_effect = ATTACK_EFFECT_CLAW
 	unarmed_attack_sound = 'sound/items/weapons/slash.ogg'
 	unarmed_miss_sound = 'sound/items/weapons/slashmiss.ogg'
+	skeleton_part = /obj/item/bodypart/arm/left/skeleton/bug
 
 /obj/item/bodypart/arm/right/moth
 	icon = 'icons/mob/human/species/moth/bodyparts.dmi'
@@ -49,6 +51,7 @@
 	unarmed_attack_effect = ATTACK_EFFECT_CLAW
 	unarmed_attack_sound = 'sound/items/weapons/slash.ogg'
 	unarmed_miss_sound = 'sound/items/weapons/slashmiss.ogg'
+	skeleton_part = /obj/item/bodypart/arm/right/skeleton/bug
 
 /obj/item/bodypart/leg/left/moth
 	icon = 'icons/mob/human/species/moth/bodyparts.dmi'
@@ -56,6 +59,7 @@
 	icon_static = 'icons/mob/human/species/moth/bodyparts.dmi'
 	limb_id = SPECIES_MOTH
 	should_draw_greyscale = FALSE
+	skeleton_part = /obj/item/bodypart/leg/left/skeleton/bug
 
 /obj/item/bodypart/leg/right/moth
 	icon = 'icons/mob/human/species/moth/bodyparts.dmi'
@@ -63,3 +67,4 @@
 	icon_static = 'icons/mob/human/species/moth/bodyparts.dmi'
 	limb_id = SPECIES_MOTH
 	should_draw_greyscale = FALSE
+	skeleton_part = /obj/item/bodypart/leg/right/skeleton/bug

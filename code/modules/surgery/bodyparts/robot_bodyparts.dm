@@ -44,7 +44,7 @@
 	damage_examines = list(BRUTE = ROBOTIC_BRUTE_EXAMINE_TEXT, BURN = ROBOTIC_BURN_EXAMINE_TEXT)
 	disabling_threshold_percentage = 1
 	bodypart_flags = BODYPART_UNHUSKABLE
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/arm/right/robot
 	name = "cyborg right arm"
@@ -80,7 +80,7 @@
 
 	damage_examines = list(BRUTE = ROBOTIC_BRUTE_EXAMINE_TEXT, BURN = ROBOTIC_BURN_EXAMINE_TEXT)
 	bodypart_flags = BODYPART_UNHUSKABLE
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/leg/left/robot
 	name = "cyborg left leg"
@@ -116,7 +116,7 @@
 
 	damage_examines = list(BRUTE = ROBOTIC_BRUTE_EXAMINE_TEXT, BURN = ROBOTIC_BURN_EXAMINE_TEXT)
 	bodypart_flags = BODYPART_UNHUSKABLE
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/leg/left/robot/emp_effect(severity, protection)
 	. = ..()
@@ -166,7 +166,7 @@
 
 	damage_examines = list(BRUTE = ROBOTIC_BRUTE_EXAMINE_TEXT, BURN = ROBOTIC_BURN_EXAMINE_TEXT)
 	bodypart_flags = BODYPART_UNHUSKABLE
-	butcher_replacement = null
+	skeleton_part = null
 
 /obj/item/bodypart/leg/right/robot/emp_effect(severity, protection)
 	. = ..()
@@ -213,7 +213,7 @@
 
 	damage_examines = list(BRUTE = ROBOTIC_BRUTE_EXAMINE_TEXT, BURN = ROBOTIC_BURN_EXAMINE_TEXT)
 	bodypart_flags = BODYPART_UNHUSKABLE
-	butcher_replacement = null
+	skeleton_part = null
 
 	robotic_emp_paralyze_damage_percent_threshold = 0.6
 
@@ -393,7 +393,7 @@
 
 	head_flags = HEAD_EYESPRITES
 	bodypart_flags = BODYPART_UNHUSKABLE
-	butcher_replacement = null
+	skeleton_part = null
 
 	var/obj/item/assembly/flash/handheld/flash1 = null
 	var/obj/item/assembly/flash/handheld/flash2 = null
