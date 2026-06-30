@@ -45,6 +45,13 @@
 		BODY_ZONE_CHEST = /obj/item/bodypart/chest/skeleton,
 	)
 
+/datum/species/skeleton/on_species_gain(mob/living/carbon/human/human_who_gained_species, datum/species/old_species, pref_load, regenerate_icons = TRUE, replace_missing = TRUE)
+	for(var/bodypart_zone in old_species.bodypart_overrides)
+		var/obj/item/bodypart/prototype = old_species.bodypart_overrides[bodypart_zone]
+		if(prototype::skeleton_part)
+			bodypart_overrides[bodypart_zone] = prototype::skeleton_part
+	return ..()
+
 /datum/species/skeleton/check_roundstart_eligible()
 	if(check_holidays(HALLOWEEN))
 		return TRUE

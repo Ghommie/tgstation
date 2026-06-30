@@ -58,6 +58,7 @@
 	bodyshape = BODYSHAPE_HUMANOID
 	footprint_sprite = FOOTPRINT_SPRITE_CLAWS
 	footstep_type = FOOTSTEP_MOB_CLAW
+	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE
 
 /obj/item/bodypart/leg/left/digitigrade/Initialize(mapload)
 	. = ..()
@@ -70,6 +71,7 @@
 	bodyshape = BODYSHAPE_HUMANOID
 	footprint_sprite = FOOTPRINT_SPRITE_CLAWS
 	footstep_type = FOOTSTEP_MOB_CLAW
+	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE
 
 /obj/item/bodypart/leg/right/digitigrade/Initialize(mapload)
 	. = ..()

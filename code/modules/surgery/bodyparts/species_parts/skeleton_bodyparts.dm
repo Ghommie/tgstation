@@ -10,6 +10,7 @@
 	bodypart_flags = BODYPART_UNHUSKABLE
 	scarrable = FALSE
 	skeleton_part = null
+	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE //for digitigrade legs
 
 /obj/item/bodypart/chest/skeleton
 	icon = 'icons/mob/human/skeleton_bodyparts.dmi'
@@ -23,6 +24,7 @@
 	wing_types = list(/obj/item/organ/wings/functional/skeleton)
 	scarrable = FALSE
 	skeleton_part = null
+	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE //for digitigrade legs
 
 ///In case this part was unfortunately aquired via butchering
 /obj/item/bodypart/chest/skeleton/on_removal(mob/living/carbon/old_owner)

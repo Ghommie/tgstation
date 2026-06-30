@@ -22,16 +22,20 @@
 	RegisterSignal(parent, COMSIG_BODYPART_ATTACHED, PROC_REF(on_attach))
 	RegisterSignal(parent, COMSIG_BODYPART_REMOVED, PROC_REF(on_remove))
 	RegisterSignal(parent, COMSIG_BODYPART_BUTCHERED, PROC_REF(on_butchered))
+	RegisterSignal(parent, COMSIG_BODYPART_SPECIES_REPLACE, PROC_REF(on_replace_body_part_changed))
 
 	if(ishuman(limb.owner))
 		on_attach(limb, limb.owner)
 
 /datum/component/digitigrade_limb/Destroy()
-	UnregisterSignal(parent, COMSIG_BODYPART_UPDATED)
-	UnregisterSignal(parent, COMSIG_BODYPART_ATTACHED)
-	UnregisterSignal(parent, COMSIG_BODYPART_REMOVED)
+	UnregisterSignal(parent, list(
+		COMSIG_BODYPART_SPECIES_REPLACE,
+		COMSIG_BODYPART_UPDATED,
+		COMSIG_BODYPART_ATTACHED,
+		COMSIG_BODYPART_REMOVED,
+		COMSIG_BODYPART_BUTCHERED,
+	))
 
-	UnregisterSignal(parent, COMSIG_BODYPART_BUTCHERED)
 	var/obj/item/bodypart/limb = parent
 	if(!QDELING(parent) && ishuman(limb.owner))
 		on_remove(limb, limb.owner)
@@ -112,8 +116,17 @@
 /// Digitigrade limbs that are butchered add the component to the replacement limb
 /datum/component/digitigrade_limb/proc/on_butchered(datum/source, obj/item/bodypart/replacement)
 	SIGNAL_HANDLER
-	squashed_id = "[initial(replacement.limb_id)]_[BODYPART_ID_DIGITIGRADE]"
-	free_id = initial(replacement.limb_id)
+	transfer_digitigrade(replacement)
+
+/datum/component/digitigrade_limb/proc/on_replace_body_part_changed(datum/source, obj/item/bodypart/replacement)
+	SIGNAL_HANDLER
+	transfer_digitigrade(replacement)
+
+/datum/component/digitigrade_limb/proc/transfer_digitigrade(obj/item/bodypart/replacement)
+	if(!(replacement.bodypart_flags & BODYPART_RETAIN_DIGITIGRADE))
+		return
+	squashed_id = initial(replacement.limb_id)
+	free_id = "[initial(replacement.limb_id)]_[BODYPART_ID_DIGITIGRADE]"
 	replacement.TakeComponent(src)
 
 /datum/component/digitigrade_limb/proc/update_limb_id(sprite_update = TRUE)
