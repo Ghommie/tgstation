@@ -56,12 +56,12 @@
 	raw_bacon.melee_attack_chain(human, griddle)
 	griddle.process(90 SECONDS) //should be done.
 
-	var/obj/item/food/meat/steak/steak = locate() in table_loc
+	var/obj/item/food/meat/steak/steak = locate() in griddle_loc
 	TEST_ASSERT_NOTNULL(steak, "Failed cooking steak!")
 	allocated += steak
 	TEST_ASSERT(meat_check(steak), "Cooked plant \"steak\" has MEAT foodtype!")
 
-	var/obj/item/food/meat/bacon/bacon = locate() in table_loc
+	var/obj/item/food/meat/bacon/bacon = locate() in griddle_loc
 	TEST_ASSERT_NOTNULL(bacon, "Failed cooking bacon!")
 	allocated += bacon
 	TEST_ASSERT(meat_check(bacon), "Cooked plant \"bacon\" has MEAT foodtype!")
