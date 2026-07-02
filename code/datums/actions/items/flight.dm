@@ -74,7 +74,7 @@
 		return
 
 	//functional
-		MODIFY_PHYSIOLOGY(human_owner, PHYS_COEFF_STUN, 0.5)
+	MODIFY_PHYSIOLOGY(human_owner, PHYS_COEFF_STUN, 0.5)
 	human_owner.remove_traits(list(TRAIT_MOVE_FLOATING, TRAIT_IGNORING_GRAVITY, TRAIT_NOGRAV_ALWAYS_DRIFT), SHOES_TRAIT)
 	human_owner.remove_movespeed_modifier(/datum/movespeed_modifier/jetpack/shoes)
 	human_owner.RemoveElement(/datum/element/forced_gravity, 0)
