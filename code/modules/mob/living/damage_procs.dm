@@ -310,27 +310,18 @@
 /mob/living/proc/get_oxy_loss()
 	return oxyloss
 
-/mob/living/proc/can_adjust_oxy_loss(amount, forced, required_biotype, required_respiration_type)
-	if(!forced)
-		if(HAS_TRAIT(src, TRAIT_GODMODE))
-			return FALSE
-		if (required_respiration_type)
-			var/obj/item/organ/lungs/affected_lungs = get_organ_slot(ORGAN_SLOT_LUNGS)
-			if(isnull(affected_lungs))
-				if(!(mob_respiration_type & required_respiration_type))  // if the mob has no lungs, use mob_respiration_type
-					return FALSE
-			else
-				if(!(affected_lungs.respiration_type & required_respiration_type)) // otherwise use the lungs' respiration_type
-					return FALSE
+/mob/living/proc/can_adjust_oxy_loss(amount, forced, required_biotype)
+	if(!forced && HAS_TRAIT(src, TRAIT_GODMODE))
+		return FALSE
 	if(SEND_SIGNAL(src, COMSIG_LIVING_ADJUST_OXY_DAMAGE, OXY, amount, forced) & COMPONENT_IGNORE_CHANGE)
 		return FALSE
 	return TRUE
 
-/mob/living/proc/adjust_oxy_loss(amount, updating_health = TRUE, forced = FALSE, required_biotype = ALL, required_respiration_type = ALL)
+/mob/living/proc/adjust_oxy_loss(amount, updating_health = TRUE, forced = FALSE, required_biotype = ALL)
 	if(amount > 0 && !forced)
 		amount *= GET_PHYSIOLOGY(src, OXY)
 
-	if(!amount || !can_adjust_oxy_loss(amount, forced, required_biotype, required_respiration_type))
+	if(!amount || !can_adjust_oxy_loss(amount, forced, required_biotype))
 		return 0
 
 	var/difference = oxyloss
@@ -339,18 +330,11 @@
 
 	return on_damage_loss(amount, updating_health, forced, OXY, difference)
 
-/mob/living/proc/set_oxy_loss(amount, updating_health = TRUE, forced = FALSE, required_biotype = ALL, required_respiration_type = ALL)
+/mob/living/proc/set_oxy_loss(amount, updating_health = TRUE, forced = FALSE, required_biotype = ALL)
 	if(!forced)
 		if(HAS_TRAIT(src, TRAIT_GODMODE))
 			return 0
 
-		var/obj/item/organ/lungs/affected_lungs = get_organ_slot(ORGAN_SLOT_LUNGS)
-		if(isnull(affected_lungs))
-			if(!(mob_respiration_type & required_respiration_type))
-				return 0
-		else
-			if(!(affected_lungs.respiration_type & required_respiration_type))
-				return 0
 	var/difference = oxyloss
 	oxyloss = amount
 	difference -= oxyloss
