@@ -422,12 +422,22 @@
 	button_icon_state = "meson"
 
 /datum/action/cooldown/borg_meson/Activate()
-	var/mob/living/silicon/robot/borg = owner
-	if(borg.sight & SEE_TURFS)
-		borg.sight_mode = BORGDEFAULT
+	if(HAS_TRAIT_FROM(owner, TRAIT_MESON_VISION, ACTION_TRAIT))
+		UnregisterSignal(owner, COMSIG_MOB_UPDATE_SIGHT)
+		REMOVE_TRAIT(owner, TRAIT_MESON_VISION, ACTION_TRAIT)
 	else
-		borg.sight_mode = BORGMESON
-	borg.update_sight()
+		RegisterSignal(owner, COMSIG_MOB_UPDATE_SIGHT, PROC_REF(on_update_sight)) //order is important as update_sight() is called when the vision trait is added/removed
+		ADD_TRAIT(owner, TRAIT_MESON_VISION, ACTION_TRAIT)
+
+/datum/action/cooldown/borg_meson/Remove(mob/remove_from)
+	UnregisterSignal(owner, COMSIG_MOB_UPDATE_SIGHT)
+	REMOVE_TRAIT(remove_from, TRAIT_MESON_VISION, ACTION_TRAIT)
+	return ..()
+
+///Add meson green shading to darker areas
+/datum/action/cooldown/borg_meson/proc/on_update_sight(mob/living/source)
+	SIGNAL_HANDLER
+	source.lighting_color_cutoffs = blend_cutoff_colors(source.lighting_color_cutoffs, list(5, 15, 5))
 
 /obj/item/robot_model/engineering/be_transformed_to(obj/item/robot_model/old_model, forced = FALSE)
 	. = ..()
@@ -1010,12 +1020,22 @@
 	button_icon_state = "thermal"
 
 /datum/action/cooldown/borg_thermal/Activate()
-	var/mob/living/silicon/robot/borg = owner
-	if(borg.sight & SEE_MOBS)
-		borg.sight_mode = BORGDEFAULT
+	if(HAS_TRAIT_FROM(owner, TRAIT_MESON_VISION, ACTION_TRAIT))
+		UnregisterSignal(owner, COMSIG_MOB_UPDATE_SIGHT)
+		REMOVE_TRAIT(owner, TRAIT_THERMAL_VISION, ACTION_TRAIT)
 	else
-		borg.sight_mode = BORGTHERM
-	borg.update_sight()
+		RegisterSignal(owner, COMSIG_MOB_UPDATE_SIGHT, PROC_REF(on_update_sight)) //order is important as update_sight() is called when the vision trait is added/removed
+		ADD_TRAIT(owner, TRAIT_THERMAL_VISION, ACTION_TRAIT)
+
+/datum/action/cooldown/borg_thermal/Remove(mob/remove_from)
+	UnregisterSignal(owner, COMSIG_MOB_UPDATE_SIGHT)
+	REMOVE_TRAIT(remove_from, TRAIT_THERMAL_VISION, ACTION_TRAIT)
+	return ..()
+
+///Add thermal reddish tint to darker areas
+/datum/action/cooldown/borg_thermal/proc/on_update_sight(mob/living/source)
+	SIGNAL_HANDLER
+	source.lighting_color_cutoffs = blend_cutoff_colors(source.lighting_color_cutoffs, list(25, 8, 5))
 
 /obj/item/robot_model/saboteur/be_transformed_to(obj/item/robot_model/old_model, forced = FALSE)
 	var/datum/action/cooldown/borg_thermal/thermal_vision = new(loc)

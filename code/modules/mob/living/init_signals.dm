@@ -43,6 +43,23 @@
 	RegisterSignal(src, SIGNAL_ADDTRAIT(TRAIT_STASIS), PROC_REF(on_stasis_trait_gain))
 	RegisterSignal(src, SIGNAL_REMOVETRAIT(TRAIT_STASIS), PROC_REF(on_stasis_trait_loss))
 
+	var/static/list/vision_trait_signals = list(
+		SIGNAL_ADDTRAIT(TRAIT_XRAY_VISION),
+		SIGNAL_REMOVETRAIT(TRAIT_XRAY_VISION),
+		SIGNAL_ADDTRAIT(TRAIT_THERMAL_VISION),
+		SIGNAL_REMOVETRAIT(TRAIT_THERMAL_VISION),
+		SIGNAL_ADDTRAIT(TRAIT_MESON_VISION),
+		SIGNAL_REMOVETRAIT(TRAIT_MESON_VISION),
+		SIGNAL_ADDTRAIT(TRAIT_TRUE_NIGHT_VISION),
+		SIGNAL_REMOVETRAIT(TRAIT_TRUE_NIGHT_VISION),
+		SIGNAL_ADDTRAIT(TRAIT_MINOR_NIGHT_VISION),
+		SIGNAL_REMOVETRAIT(TRAIT_MINOR_NIGHT_VISION),
+		SIGNAL_ADDTRAIT(TRAIT_MATERIAL_VISON),
+		SIGNAL_REMOVETRAIT(TRAIT_MATERIAL_VISON),
+	)
+
+	RegisterSignals(src, vision_trait_signals, PROC_REF(on_vision_trait_toggled))
+
 	RegisterSignals(src, list(
 		SIGNAL_ADDTRAIT(TRAIT_CRITICAL_CONDITION),
 		SIGNAL_REMOVETRAIT(TRAIT_CRITICAL_CONDITION),
@@ -230,6 +247,11 @@
 /mob/living/proc/on_stasis_trait_loss(datum/source)
 	SIGNAL_HANDLER
 	update_incapacitated()
+
+/// Called when TRAIT_XRAY_VISION is added/removed to/from the mob
+/mob/living/proc/on_vision_trait_toggled(datum/source)
+	SIGNAL_HANDLER
+	update_sight()
 
 /**
  * Called when traits that alter succumbing are added/removed.

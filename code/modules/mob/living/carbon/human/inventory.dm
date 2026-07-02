@@ -159,7 +159,7 @@
 			if(glasses)
 				return
 			glasses = equipping
-			if(glasses.vision_flags || glasses.invis_override || glasses.invis_view || !isnull(glasses.lighting_cutoff))
+			if(glasses.invis_override || glasses.invis_view || !isnull(glasses.lighting_cutoff))
 				update_sight()
 			update_worn_glasses()
 		if(ITEM_SLOT_GLOVES)
@@ -241,7 +241,7 @@
 	else if(item_dropping == glasses)
 		glasses = null
 		var/obj/item/clothing/glasses/old_glasses = item_dropping
-		if(old_glasses.vision_flags || old_glasses.invis_override || old_glasses.invis_view || !isnull(old_glasses.lighting_cutoff))
+		if(old_glasses.invis_override || old_glasses.invis_view || !isnull(old_glasses.lighting_cutoff))
 			update_sight()
 		if(!QDELETED(src))
 			update_worn_glasses()

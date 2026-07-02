@@ -400,11 +400,11 @@
 	return zlevels_in_range[into]
 
 
-/mob/eye/camera/remote/shuttle_docker/update_remote_sight(mob/living/user)
+/mob/eye/camera/remote/shuttle_docker/update_remote_sight(mob/living/user, list/new_sight)
 	user.set_sight(BLIND|SEE_TURFS)
+	lighting_cutoff = LIGHTING_CUTOFF_VISIBLE
 	// Pale blue, should look nice I think
 	user.lighting_color_cutoffs = list(30, 40, 50)
-	user.sync_lighting_plane_cutoff()
 	return TRUE
 
 /datum/action/innate/shuttledocker_rotate

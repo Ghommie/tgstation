@@ -34,20 +34,19 @@
 	button_icon_state = "meson"
 
 /datum/action/cooldown/mob_cooldown/minedrone/toggle_meson_vision/Activate()
-	if(owner.sight & SEE_TURFS)
-		owner.clear_sight(SEE_TURFS)
+	var/had_trait = HAS_TRAIT_FROM(owner, TRAIT_MESON_VISION, ACTION_TRAIT)
+	if(had_trait)
 		owner.lighting_cutoff_red += 5
 		owner.lighting_cutoff_green += 15
 		owner.lighting_cutoff_blue += 5
+		REMOVE_TRAIT(owner, TRAIT_MESON_VISION, ACTION_TRAIT)
 	else
-		owner.add_sight(SEE_TURFS)
 		owner.lighting_cutoff_red -= 5
 		owner.lighting_cutoff_green -= 15
 		owner.lighting_cutoff_blue -= 5
+		REMOVE_TRAIT(owner, TRAIT_MESON_VISION, ACTION_TRAIT)
 
-	owner.sync_lighting_plane_cutoff()
-
-	to_chat(owner, span_notice("You toggle your meson vision [(owner.sight & SEE_TURFS) ? "on" : "off"]."))
+	to_chat(owner, span_notice("You toggle your meson vision [had_trait ? "off" : "on"]."))
 
 /datum/action/cooldown/mob_cooldown/missile_launcher
 	name = "Launch Missile"

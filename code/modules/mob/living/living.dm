@@ -2004,6 +2004,83 @@ GLOBAL_LIST_EMPTY(fire_appearances)
 	user.visible_message(span_warning("[user] scoops up [src]!"))
 	user.put_in_hands(holder)
 
+/mob/living/update_sight()
+	if(!client)
+		return
+
+	if(stat == DEAD && !HAS_TRAIT(src, TRAIT_CORPSELOCKED))
+		if(SSmapping.level_trait(z, ZTRAIT_NOXRAY))
+			set_sight(NONE)
+		else if(is_secret_level(z))
+			set_sight(initial(sight))
+		else
+			set_sight(SEE_TURFS|SEE_MOBS|SEE_OBJS)
+		set_invis_see(SEE_INVISIBLE_OBSERVER)
+		return
+
+	var/new_sight = initial(sight)
+
+	lighting_cutoff = initial(lighting_cutoff)
+	lighting_color_cutoffs = list(lighting_cutoff_red, lighting_cutoff_green, lighting_cutoff_blue)
+
+	if(client.eye && client.eye != src)
+		var/atom/A = client.eye
+		var/list/new_sight_wrapper = list(initial(sight))
+		if(A.update_remote_sight(src, new_sight_wrapper)) //returns TRUE if we override all other sight updates.
+			return ..() //still, call sync_lighting_plane_cutoff()
+		new_sight = new_sight_wrapper[1]
+
+	var/obj/item/organ/eyes/eyes = get_organ_slot(ORGAN_SLOT_EYES)
+	if(eyes)
+		set_invis_see(eyes.see_invisible)
+		new_sight |= eyes.sight_flags
+		if(!isnull(eyes.lighting_cutoff))
+			lighting_cutoff = eyes.lighting_cutoff
+		if(!isnull(eyes.color_cutoffs))
+			lighting_color_cutoffs = blend_cutoff_colors(lighting_color_cutoffs, eyes.color_cutoffs)
+
+	if(HAS_TRAIT(src, TRAIT_MESON_VISION))
+		new_sight |= SEE_TURFS
+		lighting_cutoff = max(lighting_cutoff, LIGHTING_CUTOFF_MEDIUM)
+
+	if(HAS_TRAIT(src, TRAIT_THERMAL_VISION))
+		new_sight |= SEE_MOBS
+		lighting_cutoff = max(lighting_cutoff, LIGHTING_CUTOFF_MEDIUM)
+
+	if(HAS_TRAIT(src, TRAIT_XRAY_VISION))
+		new_sight |= SEE_TURFS|SEE_MOBS|SEE_OBJS
+
+	if(HAS_TRAIT(src, TRAIT_MATERIAL_VISON))
+		new_sight |= SEE_OBJS
+		lighting_cutoff = max(lighting_cutoff, LIGHTING_CUTOFF_LOW)
+
+	if(SSmapping.level_trait(z, ZTRAIT_NOXRAY))
+		new_sight = NONE
+
+	if(HAS_TRAIT(src, TRAIT_TRUE_NIGHT_VISION))
+		lighting_cutoff = max(lighting_cutoff, LIGHTING_CUTOFF_HIGH)
+
+	else if (HAS_TRAIT(src, TRAIT_MINOR_NIGHT_VISION))
+		lighting_cutoff = max(lighting_cutoff, LIGHTING_CUTOFF_LOW)
+
+	if(HAS_TRAIT(src, TRAIT_ECHOLOCATOR))
+		new_sight |= SEE_MOBS|SEE_TURFS
+		lighting_cutoff = max(lighting_cutoff, LIGHTING_CUTOFF_FULLBRIGHT)
+
+	var/obj/item/clothing/glasses/glasses = get_item_by_slot(ITEM_SLOT_EYES)
+	if(glasses)
+		if(glasses.invis_override)
+			set_invis_see(glasses.invis_override)
+		else
+			set_invis_see(min(glasses.invis_view, see_invisible))
+		if(!isnull(glasses.lighting_cutoff))
+			lighting_cutoff = max(lighting_cutoff, glasses.lighting_cutoff)
+		if(length(glasses.color_cutoffs))
+			lighting_color_cutoffs = blend_cutoff_colors(lighting_color_cutoffs, glasses.color_cutoffs)
+
+	set_sight(new_sight)
+	return ..()
+
 /mob/living/proc/set_name()
 	if(identifier == 0)
 		identifier = rand(1, 999)

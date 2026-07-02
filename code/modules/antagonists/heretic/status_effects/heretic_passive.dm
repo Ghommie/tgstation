@@ -369,7 +369,6 @@
 /datum/status_effect/heretic_passive/lock/heretic_level_upgrade()
 	. = ..()
 	ADD_TRAIT(owner, TRAIT_XRAY_VISION, REF(src))
-	owner.update_sight()
 
 /datum/status_effect/heretic_passive/lock/heretic_level_final()
 	. = ..()
@@ -378,7 +377,6 @@
 /datum/status_effect/heretic_passive/lock/on_remove()
 	UnregisterSignal(owner, COMSIG_HERETIC_SHOP_SETUP)
 	owner.remove_traits(list(TRAIT_SHOCKIMMUNE, TRAIT_XRAY_VISION, TRAIT_LOCK_GRASP_UPGRADED), REF(src))
-	owner.update_sight()
 	return ..()
 
 /datum/status_effect/heretic_passive/lock/proc/on_shop_setup(datum/antagonist/heretic/heretic_datum)

@@ -15,12 +15,10 @@
 /obj/item/mod/module/visor/on_activation(mob/activator)
 	if(length(visor_traits))
 		mod.wearer.add_traits(visor_traits, REF(src))
-	mod.wearer.update_sight()
 
 /obj/item/mod/module/visor/on_deactivation(mob/activator, display_message = TRUE, deleting = FALSE)
 	if(length(visor_traits))
 		mod.wearer.remove_traits(visor_traits, REF(src))
-	mod.wearer.update_sight()
 
 //Medical Visor - Gives you a medical HUD.
 /obj/item/mod/module/visor/medhud
@@ -93,8 +91,6 @@
 
 /obj/item/mod/module/night/on_activation(mob/activator)
 	ADD_TRAIT(mod.wearer, TRAIT_TRUE_NIGHT_VISION, REF(src))
-	mod.wearer.update_sight()
 
 /obj/item/mod/module/night/on_deactivation(mob/activator, display_message = TRUE, deleting = FALSE)
 	REMOVE_TRAIT(mod.wearer, TRAIT_TRUE_NIGHT_VISION, REF(src))
-	mod.wearer.update_sight()
