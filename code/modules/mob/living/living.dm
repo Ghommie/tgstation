@@ -2033,7 +2033,6 @@ GLOBAL_LIST_EMPTY(fire_appearances)
 	var/obj/item/organ/eyes/eyes = get_organ_slot(ORGAN_SLOT_EYES)
 	if(eyes)
 		set_invis_see(eyes.see_invisible)
-		new_sight |= eyes.sight_flags
 		if(!isnull(eyes.lighting_cutoff))
 			lighting_cutoff = eyes.lighting_cutoff
 		if(!isnull(eyes.color_cutoffs))
