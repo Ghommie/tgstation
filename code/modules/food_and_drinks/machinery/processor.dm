@@ -180,6 +180,10 @@
 			continue
 		total_time += recipe.time
 
+	if(PERFORM_ALL_TESTS(make_vegan_wellington)) //don't waste time, we need that uncooked bacon strip right away
+		complete_processing()
+		return
+
 	var/duration = (total_time / rating_speed)
 	INVOKE_ASYNC(src, TYPE_PROC_REF(/atom, Shake), 1, 0, duration)
 	addtimer(CALLBACK(src, PROC_REF(complete_processing)), duration)
