@@ -6,6 +6,7 @@
 	icon_state = "default_monkey_head"
 	limb_id = SPECIES_MONKEY
 	bodyshape = BODYSHAPE_MONKEY
+	skeleton_part = /obj/item/bodypart/head/skeleton/monkey
 	should_draw_greyscale = FALSE
 	dmg_overlay_type = SPECIES_MONKEY
 	is_dimorphic = FALSE
@@ -38,6 +39,12 @@
 	acceptable_bodyshape = BODYSHAPE_MONKEY
 	dmg_overlay_type = SPECIES_MONKEY
 	skeleton_part = /obj/item/bodypart/chest/skeleton/monkey
+	bodypart_traits = list(
+		TRAIT_PASSTABLE,
+		TRAIT_VENTCRAWLER_NUDE,
+		TRAIT_NO_AUGMENTS,
+		TRAIT_NO_UNDERWEAR,
+	)
 
 /obj/item/bodypart/chest/monkey/Initialize(mapload)
 	worn_neck_offset = new(
@@ -46,6 +53,15 @@
 		offset_y = list("south" = 1),
 	)
 	return ..()
+
+/obj/item/bodypart/chest/monkey/update_mob_heights(mob/living/carbon/holder)
+	if(HAS_TRAIT(holder, TRAIT_DWARF))
+		return MONKEY_HEIGHT_DWARF
+
+	if(HAS_TRAIT(holder, TRAIT_TOO_TALL))
+		return MONKEY_HEIGHT_TALL
+
+	return MONKEY_HEIGHT_MEDIUM
 
 /obj/item/bodypart/arm/left/monkey
 	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
@@ -60,11 +76,11 @@
 	px_x = -5
 	px_y = -3
 	dmg_overlay_type = SPECIES_MONKEY
+	skeleton_part = /obj/item/bodypart/arm/left/skeleton/monkey
 	unarmed_damage_low = 3
 	unarmed_damage_high = 8
 	unarmed_effectiveness = 5
 	appendage_noun = "paw"
-	skeleton_part = /obj/item/bodypart/arm/left/skeleton/monkey
 
 /obj/item/bodypart/arm/right/monkey
 	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
@@ -79,11 +95,11 @@
 	px_x = 5
 	px_y = -3
 	dmg_overlay_type = SPECIES_MONKEY
+	skeleton_part = /obj/item/bodypart/arm/right/skeleton/monkey
 	unarmed_damage_low = 3
 	unarmed_damage_high = 8
 	unarmed_effectiveness = 0
 	appendage_noun = "paw"
-	skeleton_part = /obj/item/bodypart/arm/right/skeleton/monkey
 
 /obj/item/bodypart/leg/left/monkey
 	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
@@ -97,11 +113,11 @@
 	wound_resistance = -10
 	px_y = 4
 	dmg_overlay_type = SPECIES_MONKEY
+	skeleton_part = /obj/item/bodypart/leg/left/skeleton/monkey
 	unarmed_damage_low = 2
 	unarmed_damage_high = 3
 	unarmed_effectiveness = 5
 	footprint_sprite = FOOTPRINT_SPRITE_PAWS
-	skeleton_part = /obj/item/bodypart/leg/left/skeleton/monkey
 
 /obj/item/bodypart/leg/right/monkey
 	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
@@ -115,8 +131,8 @@
 	wound_resistance = -10
 	px_y = 4
 	dmg_overlay_type = SPECIES_MONKEY
+	skeleton_part = /obj/item/bodypart/leg/right/skeleton/monkey
 	unarmed_damage_low = 2
 	unarmed_damage_high = 3
 	unarmed_effectiveness = 5
 	footprint_sprite = FOOTPRINT_SPRITE_PAWS
-	skeleton_part = /obj/item/bodypart/leg/right/skeleton/monkey

@@ -20,8 +20,7 @@
 
 /// Blacklist of parts which should not appear when bioscrambled, largely because they will make you look totally fucked up
 GLOBAL_LIST_INIT(bioscrambler_parts_blacklist, typecacheof(list(
-	/obj/item/bodypart/chest/larva,
-	/obj/item/bodypart/head/larva,
+	/obj/item/bodypart/head/psyker,
 )))
 
 /// Blacklist of organs which should not appear when bioscrambled.

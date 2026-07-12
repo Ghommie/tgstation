@@ -10,7 +10,6 @@
 	bodypart_flags = BODYPART_UNHUSKABLE
 	scarrable = FALSE
 	skeleton_part = null
-	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE //for digitigrade legs
 
 /obj/item/bodypart/chest/skeleton
 	icon = 'icons/mob/human/skeleton_bodyparts.dmi'
@@ -24,7 +23,12 @@
 	wing_types = list(/obj/item/organ/wings/functional/skeleton)
 	scarrable = FALSE
 	skeleton_part = null
-	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE //for digitigrade legs
+	bodypart_traits = list(
+		TRAIT_EASYDISMEMBER,
+		TRAIT_LIMBATTACHMENT,
+		TRAIT_NO_UNDERWEAR,
+		TRAIT_XENO_IMMUNE,
+	)
 
 ///In case this part was unfortunately aquired via butchering
 /obj/item/bodypart/chest/skeleton/on_removal(mob/living/carbon/old_owner)
@@ -63,6 +67,7 @@
 	bodypart_flags = BODYPART_UNHUSKABLE
 	scarrable = FALSE
 	skeleton_part = null
+	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE //for digitigrade legs
 
 /obj/item/bodypart/leg/right/skeleton
 	icon = 'icons/mob/human/skeleton_bodyparts.dmi'
@@ -74,10 +79,13 @@
 	bodypart_flags = BODYPART_UNHUSKABLE
 	scarrable = FALSE
 	skeleton_part = null
+	bodypart_flags = parent_type::bodypart_flags | BODYPART_RETAIN_DIGITIGRADE //for digitigrade legs
 
-#define BODYPART_ID_SKELETON_BUG "skeleton_bug"
-#define BODYPART_ID_SKELETON_MONKEY "skeleton_monkey"
-#define BODYPART_ID_SKELETON_MUSH "skeleton_mush"
+
+//NON-GENERIC SKELETON PARTS
+
+/obj/item/bodypart/head/skeleton/snouted
+	limb_id = BODYPART_ID_SKELETON_SNOUTED
 
 /obj/item/bodypart/head/skeleton/bug
 	limb_id = BODYPART_ID_SKELETON_BUG
@@ -134,6 +142,12 @@
 	bodyshape = /obj/item/bodypart/chest/monkey::bodyshape
 	acceptable_bodyshape = /obj/item/bodypart/chest/monkey::acceptable_bodyshape
 	dmg_overlay_type = /obj/item/bodypart/chest/monkey::dmg_overlay_type
+	bodypart_traits = list(
+		TRAIT_PASSTABLE,
+		TRAIT_VENTCRAWLER_NUDE,
+		TRAIT_NO_AUGMENTS,
+		TRAIT_NO_UNDERWEAR,
+	)
 
 /obj/item/bodypart/chest/skeleton/monkey/Initialize(mapload)
 	worn_neck_offset = new(
