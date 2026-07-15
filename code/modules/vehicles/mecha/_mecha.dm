@@ -218,6 +218,9 @@
 	/// Module selected by default when mech UI is opened
 	var/ui_selected_module_index
 
+	///The capacity of the shell component (integrated circuits) if one is ever added
+	var/shell_capacity = SHELL_CAPACITY_VERY_LARGE
+
 /datum/armor/sealed_mecha
 	melee = 20
 	bullet = 10
@@ -272,6 +275,39 @@
 
 	AddElement(/datum/element/falling_hazard, damage = 80, wound_bonus = 10, hardhat_safety = FALSE, crushes = TRUE)
 	AddElement(/datum/element/hostile_machine)
+
+	var/list/circuit_components = get_shell_circuit_components()
+	if(length(circuit_components))
+		var/datum/component/shell/shell = AddComponent(/datum/component/shell, circuit_components, shell_capacity, SHELL_FLAG_USB_PORT|SHELL_FLAG_ALLOW_FAILURE_ACTION)
+		RegisterSignal(shell, COMSIG_SHELL_CIRCUIT_ATTACHED, PROC_REF(on_circuit_attached))
+		RegisterSignal(shell, COMSIG_SHELL_CIRCUIT_REMOVED, PROC_REF(on_circuit_removed))
+
+/obj/vehicle/sealed/mecha/proc/get_shell_circuit_components()
+	var/list/components = list(
+		/obj/item/circuit_component/mecha/main,
+		/obj/item/circuit_component/mecha/actions,
+		/obj/item/circuit_component/mecha/movement,
+		/obj/item/circuit_component/mecha/combat,
+	)
+	if(max_equip_by_category[MECHA_L_ARM] || max_equip_by_category[MECHA_R_ARM])
+		components += /obj/item/circuit_component/mecha/equipment
+	return components
+
+/obj/vehicle/sealed/mecha/proc/on_circuit_attached(datum/source)
+	SIGNAL_HANDLER
+	var/datum/component/shell/shell = GetComponent(/datum/component/shell)
+	RegisterSignal(shell.attached_circuit, COMSIG_CIRCUIT_PRE_POWER_USAGE, PROC_REF(use_energy_for_circuits))
+
+///Try to draw power from our cell first, before switching to that of the circuit.
+/obj/vehicle/sealed/mecha/proc/use_energy_for_circuits(datum/source, energy_usage_per_input)
+	SIGNAL_HANDLER
+	if(use_energy(energy_usage_per_input))
+		return COMPONENT_OVERRIDE_POWER_USAGE
+
+/obj/vehicle/sealed/mecha/proc/on_circuit_removed(datum/source)
+	SIGNAL_HANDLER
+	var/datum/component/shell/shell = GetComponent(/datum/component/shell)
+	UnregisterSignal(shell.attached_circuit, COMSIG_CIRCUIT_PRE_POWER_USAGE)
 
 /obj/vehicle/sealed/mecha/Destroy()
 	/// If the former occupants get polymorphed, mutated, chestburstered,

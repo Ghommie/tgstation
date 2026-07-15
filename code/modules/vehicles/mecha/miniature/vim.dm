@@ -46,6 +46,7 @@
 		MECHA_POWER = 1,
 		MECHA_ARMOR = 1,
 	)
+	shell_capacity = SHELL_CAPACITY_SMALL
 	///Maximum size of a mob trying to enter the mech
 	var/maximum_mob_size = MOB_SIZE_SMALL
 	COOLDOWN_DECLARE(sound_cooldown)

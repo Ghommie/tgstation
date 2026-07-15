@@ -6790,6 +6790,7 @@
 #include "code\modules\vehicles\mecha\mech_melee_attack.dm"
 #include "code\modules\vehicles\mecha\mecha_actions.dm"
 #include "code\modules\vehicles\mecha\mecha_ai_interaction.dm"
+#include "code\modules\vehicles\mecha\mecha_circuits.dm"
 #include "code\modules\vehicles\mecha\mecha_construction_paths.dm"
 #include "code\modules\vehicles\mecha\mecha_control_console.dm"
 #include "code\modules\vehicles\mecha\mecha_damage.dm"
