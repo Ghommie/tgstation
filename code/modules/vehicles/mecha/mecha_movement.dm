@@ -119,8 +119,6 @@
 			TIMER_COOLDOWN_START(src, COOLDOWN_MECHA_MESSAGE, 2 SECONDS)
 		return FALSE
 
-	var/olddir = dir
-
 	if(internal_damage & MECHA_INT_CONTROL_LOST)
 		direction = pick(GLOB.alldirs)
 
@@ -150,8 +148,9 @@
 
 	if(phasing)
 		use_energy(phasing_energy_drain)
-	if(strafe)
-		setDir(olddir)
+
+	if(.)
+		SEND_SIGNAL(src, COMSIG_MECHA_VEHICULAR_MOVE, direction)
 
 /obj/vehicle/sealed/mecha/Bump(atom/obstacle)
 	. = ..()

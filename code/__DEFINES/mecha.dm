@@ -27,6 +27,8 @@
 #define BEACON_TRACKABLE (1<<14)
 /// Can have an AI control beacon placed into the mech
 #define BEACON_CONTROLLABLE (1<<15)
+/// If the mecha is operational
+#define MECHA_OPERATIONAL (1<<16)
 
 #define MECHA_MELEE (1 << 0)
 #define MECHA_RANGED (1 << 1)

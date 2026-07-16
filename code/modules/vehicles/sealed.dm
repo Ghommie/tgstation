@@ -89,20 +89,18 @@
 /obj/vehicle/sealed/proc/mob_try_exit(mob/M, mob/user, silent = FALSE, randomstep = FALSE)
 	mob_exit(M, silent, randomstep)
 
-/obj/vehicle/sealed/proc/mob_exit(mob/M, silent = FALSE, randomstep = FALSE)
-	if(!istype(M))
+/obj/vehicle/sealed/proc/mob_exit(mob/mob, silent = FALSE, randomstep = FALSE)
+	if(!istype(mob))
 		return FALSE
-	remove_occupant(M)
-	if(!isAI(M))//This is the ONE mob we don't want to be moved to the vehicle that should be handled when used
-		M.forceMove(exit_location(M))
-	else
-		return TRUE
-	if(randomstep)
-		var/turf/target_turf = get_step(exit_location(M), pick(GLOB.cardinals))
-		M.throw_at(target_turf, 5, 10)
-
-	if(!silent)
-		M.visible_message(span_notice("[M] drops out of \the [src]!"))
+	remove_occupant(mob)
+	if(!isAI(mob))//This is the ONE mob we don't want to be moved to the vehicle that should be handled when used
+		mob.forceMove(exit_location(mob))
+		if(randomstep)
+			var/turf/target_turf = get_step(exit_location(mob), pick(GLOB.cardinals))
+			mob.throw_at(target_turf, 5, 10)
+		if(!silent)
+			mob.visible_message(span_notice("[mob] drops out of \the [src]!"))
+	SEND_SIGNAL(src, COMSIG_SEALED_VEHICLE_MOB_EXIT, mob)
 	return TRUE
 
 /obj/vehicle/sealed/proc/exit_location(M)

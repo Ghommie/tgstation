@@ -81,7 +81,7 @@
 ///Redirects clicks to use the drill if possible when enabled
 /obj/item/mecha_parts/mecha_equipment/drill/proc/on_mech_click(atom/mech, mob/source, atom/target, on_cooldown, adjacent)
 	SIGNAL_HANDLER
-	if(on_cooldown || !adjacent)
+	if(on_cooldown || !adjacent || !source) //TODO pilotless drilling
 		return
 	INVOKE_ASYNC(src, PROC_REF(action), source, target, null, FALSE)
 	return COMPONENT_CANCEL_MELEE_CLICK

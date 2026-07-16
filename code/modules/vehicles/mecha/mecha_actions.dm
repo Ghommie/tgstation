@@ -114,6 +114,7 @@
 		return
 
 	strafe = !strafe
+	set_dir_on_move = !strafe
 
 	for(var/mob/occupant in occupants)
 		balloon_alert(occupant, "strafing [strafe?"on":"off"]")

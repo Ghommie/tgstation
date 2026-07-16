@@ -3,7 +3,7 @@
 	name = "\improper APLU MK-I \"Ripley\""
 	icon_state = "ripley"
 	base_icon_state = "ripley"
-	silicon_icon_state = "ripley-empty"
+	pilotless_icon_state = "ripley-empty"
 	movedelay = 1.5 //Move speed, lower is faster.
 	overclock_coeff = 1.25
 	max_temperature = 20000
@@ -80,7 +80,7 @@
 	armor_type = /datum/armor/mecha_ripley_mk2
 	wreckage = /obj/structure/mecha_wreckage/ripley/mk2
 	enter_delay = 40
-	silicon_icon_state = null
+	pilotless_icon_state = null
 
 /datum/armor/mecha_ripley_mk2
 	melee = 40
@@ -111,7 +111,7 @@
 	accesses = list(ACCESS_MECH_SCIENCE, ACCESS_MECH_SECURITY)
 	armor_type = /datum/armor/mecha_paddy
 	wreckage = /obj/structure/mecha_wreckage/ripley/paddy
-	silicon_icon_state = "paddy-empty"
+	pilotless_icon_state = "paddy-empty"
 	equip_by_category = list(
 		MECHA_L_ARM = null,
 		MECHA_R_ARM = null,
@@ -197,7 +197,7 @@
 	step_energy_drain = 0
 	mecha_flags = CAN_STRAFE | IS_ENCLOSED | HAS_LIGHTS | MMI_COMPATIBLE | AI_COMPATIBLE
 	enter_delay = 40
-	silicon_icon_state = null
+	pilotless_icon_state = null
 	equip_by_category = list(
 		MECHA_L_ARM = /obj/item/mecha_parts/mecha_equipment/hydraulic_clamp/kill/fake,
 		MECHA_R_ARM = null,
@@ -250,7 +250,7 @@ GLOBAL_DATUM(cargo_ripley, /obj/vehicle/sealed/mecha/ripley/cargo)
 	desc = "An ailing, old, repurposed cargo hauler. Most of its equipment wires are frayed or missing and its frame is rusted."
 	icon_state = "hauler"
 	base_icon_state = "hauler"
-	silicon_icon_state = "hauler-empty"
+	pilotless_icon_state = "hauler-empty"
 	max_integrity = 100 //Has half the health of a normal RIPLEY mech, so it's harder to use as a weapon.
 
 /obj/vehicle/sealed/mecha/ripley/cargo/Initialize(mapload)

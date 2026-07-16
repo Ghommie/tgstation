@@ -11,6 +11,10 @@
 	if(isnull(mecha))
 		return
 
+/obj/item/circuit_component/mecha/unregister_shell(atom/movable/shell)
+	mecha = null
+	return ..()
+
 /obj/item/circuit_component/mecha/main
 	display_name = "Engagement"
 	desc = "For engaging and disengaging an exosuit, even if it doesn't have an occupant inside."
@@ -78,6 +82,8 @@
 
 	var/datum/port/output/dir_changed
 	var/datum/port/output/current_dir
+
+/obj/item/circuit_component/mecha/movement/populate_ports()
 
 /obj/item/circuit_component/mecha/combat
 	display_name = "Combat"

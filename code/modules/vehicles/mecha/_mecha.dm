@@ -152,8 +152,8 @@
 	var/exit_delay = 2 SECONDS
 	///Time you get slept for if you get forcible ejected by the mech exploding
 	var/destruction_sleep_duration = 2 SECONDS
-	///In case theres a different iconstate for AI/MMI pilot(currently only used for ripley)
-	var/silicon_icon_state = null
+	///In case theres a different iconstate for AI/MMI pilot or when remote-controlled(currently only used for ripley)
+	var/pilotless_icon_state = null
 	///Currently ejecting, and unable to do things
 	var/is_currently_ejecting = FALSE
 	///Safety for weapons. Won't fire if enabled, and toggled by middle click.
@@ -451,10 +451,6 @@
 	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_view_stats, VEHICLE_CONTROL_SETTINGS)
 	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/strafe, VEHICLE_CONTROL_DRIVE)
 
-/obj/vehicle/sealed/mecha/add_occupant(mob/M, control_flags, forced)
-	if(..())
-		generate_equipment_actions(M)
-
 /obj/vehicle/sealed/mecha/remove_occupant(mob/M)
 	remove_all_equipment_actions(M)
 	return ..()
@@ -527,9 +523,10 @@
 	return TRUE
 
 /obj/vehicle/sealed/mecha/proc/get_mecha_occupancy_state()
-	if((mecha_flags & SILICON_PILOT) && silicon_icon_state)
-		return silicon_icon_state
-	if(LAZYLEN(occupants))
+	var/has_occupants = LAZYLEN(occupants)
+	if((mecha_flags & SILICON_PILOT) || ((mecha_flags & MECHA_OPERATIONAL) && !has_occupants))
+		return pilotless_icon_state || base_icon_state
+	if(has_occupants)
 		return base_icon_state
 	return "[base_icon_state]-open"
 
@@ -786,18 +783,26 @@
 		return COMSIG_MOB_CANCEL_CLICKON
 	if(weapons_safety)
 		return
+	if(user.incapacitated)
+		return
 	if(isAI(user)) //For AIs: If safeties are off, use mech functions. If safeties are on, use AI functions.
 		. = COMSIG_MOB_CANCEL_CLICKON
 	if(modifiers[SHIFT_CLICK]) //Allows things to be examined.
 		return
+	interact_with_atom(target, user, modifiers)
+
+/**
+ * Interact with a target. Remember that the user may also be null (no pilot). Generally, it prioritizes using the equipment in the right
+ * or left slot depending on the pressed button, otherwise it defaults to melee attacks.
+ */
+/obj/vehicle/sealed/mecha/proc/interact_with_atom(atom/target, mob/user, list/modifiers, only_melee = FALSE)
 	if(!isturf(target) && !isturf(target.loc)) // Prevents inventory from being drilled
 		return
 	if(completely_disabled || is_currently_ejecting || (mecha_flags & CANNOT_INTERACT))
 		return
 	if(phasing)
-		balloon_alert(user, "not while [phasing]!")
-		return
-	if(user.incapacitated)
+		if(user)
+			balloon_alert(user, "not while [phasing]!")
 		return
 	if(!get_charge())
 		return
@@ -808,38 +813,38 @@
 		return
 	if(internal_damage & MECHA_INT_CONTROL_LOST)
 		target = pick(view(3,target))
-	var/mob/living/livinguser = user
-	if(!(livinguser in return_controllers_with_flag(VEHICLE_CONTROL_EQUIPMENT)))
+	if(user && !(user in return_controllers_with_flag(VEHICLE_CONTROL_EQUIPMENT)))
 		balloon_alert(user, "wrong seat for equipment!")
 		return
 	var/obj/item/mecha_parts/mecha_equipment/selected
-	if(modifiers[BUTTON] == RIGHT_CLICK)
-		selected = equip_by_category[MECHA_R_ARM]
-	else
-		selected = equip_by_category[MECHA_L_ARM]
+	if(!only_melee)
+		if(modifiers[BUTTON] == RIGHT_CLICK)
+			selected = equip_by_category[MECHA_R_ARM]
+		else
+			selected = equip_by_category[MECHA_L_ARM]
 	if(selected)
 		if(!Adjacent(target) && (selected.range & MECHA_RANGED))
-			if(HAS_TRAIT(livinguser, TRAIT_PACIFISM) && selected.harmful)
-				to_chat(livinguser, span_warning("You don't want to harm other living beings!"))
+			if(user && HAS_TRAIT(user, TRAIT_PACIFISM) && selected.harmful)
+				to_chat(user, span_warning("You don't want to harm other living beings!"))
 				return
-			if(SEND_SIGNAL(src, COMSIG_MECHA_EQUIPMENT_CLICK, livinguser, target) & COMPONENT_CANCEL_EQUIPMENT_CLICK)
+			if(SEND_SIGNAL(src, COMSIG_MECHA_EQUIPMENT_CLICK, user, target) & COMPONENT_CANCEL_EQUIPMENT_CLICK)
 				return
 			INVOKE_ASYNC(selected, TYPE_PROC_REF(/obj/item/mecha_parts/mecha_equipment, action), user, target, modifiers)
 			return
 		if(Adjacent(target) && (selected.range & MECHA_MELEE))
-			if(isliving(target) && selected.harmful && HAS_TRAIT(livinguser, TRAIT_PACIFISM))
-				to_chat(livinguser, span_warning("You don't want to harm other living beings!"))
+			if(user && isliving(target) && selected.harmful && HAS_TRAIT(user, TRAIT_PACIFISM))
+				to_chat(user, span_warning("You don't want to harm other living beings!"))
 				return
-			if(SEND_SIGNAL(src, COMSIG_MECHA_EQUIPMENT_CLICK, livinguser, target) & COMPONENT_CANCEL_EQUIPMENT_CLICK)
+			if(SEND_SIGNAL(src, COMSIG_MECHA_EQUIPMENT_CLICK, user, target) & COMPONENT_CANCEL_EQUIPMENT_CLICK)
 				return
 			INVOKE_ASYNC(selected, TYPE_PROC_REF(/obj/item/mecha_parts/mecha_equipment, action), user, target, modifiers)
 			return
-	if(!(livinguser in return_controllers_with_flag(VEHICLE_CONTROL_MELEE)))
-		to_chat(livinguser, span_warning("You're in the wrong seat to interact with your hands."))
-		return
+	if(user && !(user in return_controllers_with_flag(VEHICLE_CONTROL_MELEE)))
+		to_chat(user, span_warning("You're in the wrong seat to interact with your hands."))
+		return FALSE
 	var/on_cooldown = TIMER_COOLDOWN_RUNNING(src, COOLDOWN_MECHA_MELEE_ATTACK)
 	var/adjacent = Adjacent(target)
-	if(SEND_SIGNAL(src, COMSIG_MECHA_MELEE_CLICK, livinguser, target, on_cooldown, adjacent) & COMPONENT_CANCEL_MELEE_CLICK)
+	if(SEND_SIGNAL(src, COMSIG_MECHA_MELEE_CLICK, user, target, on_cooldown, adjacent) & COMPONENT_CANCEL_MELEE_CLICK)
 		return
 	if(on_cooldown || !adjacent)
 		return
@@ -850,7 +855,9 @@
 		return
 	use_energy(melee_energy_drain)
 
-	SEND_SIGNAL(user, COMSIG_MOB_USED_CLICK_MECH_MELEE, src)
+	if(user)
+		SEND_SIGNAL(user, COMSIG_MOB_USED_CLICK_MECH_MELEE, src)
+
 	if(target.mech_melee_attack(src, user))
 		TIMER_COOLDOWN_START(src, COOLDOWN_MECHA_MELEE_ATTACK, melee_cooldown)
 
@@ -1058,3 +1065,26 @@
 		victim.Unconscious(2 SECONDS)
 	else
 		victim.Knockdown(4 SECONDS)
+
+///Invoked by the mech removal crowbar and the "Eject" input for integrated circuits
+/obj/vehicle/sealed/mecha/proc/eject_everyone()
+	var/obj/item/mecha_parts/mecha_equipment/sleeper/mech_sleeper = locate() in src
+	if(mech_sleeper?.patient)
+		mech_sleeper.go_out()
+	for(var/mob/living/occupant as anything in SANITIZE_LIST(occupants))
+		if(isAI(occupant) || isbrain(occupant))
+			continue
+		mob_exit(occupant)
+	if(mecha_flags & MECHA_OPERATIONAL && !(mecha_flags & SILICON_PILOT)) //It's operational, but it isn't piloted by a silicon, so it's likely operated via circuits.
+		reset_to_non_operational()
+
+///Called when an occupant climbs in a mech that didn't previously have the MECHA_OPERATIONAL flag, or if activated via the "Engage" input for integrated circuits
+/obj/vehicle/sealed/mecha/proc/set_to_operational()
+	mecha_flags |= MECHA_OPERATIONAL
+	update_appearance()
+
+///Called when the last occupant exits the mech, or if [eject_everyone()] is called.
+/obj/vehicle/sealed/mecha/proc/reset_to_non_operational()
+	mecha_flags &= ~MECHA_OPERATIONAL
+	setDir(SOUTH)
+	update_appearance()

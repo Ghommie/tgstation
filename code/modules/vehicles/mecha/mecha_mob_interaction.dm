@@ -22,6 +22,8 @@
 /obj/vehicle/sealed/mecha/enter_checks(mob/M)
 	if(M.incapacitated)
 		return FALSE
+	if(max_occupants == 1 && (mecha_flags & MECHA_OPERATIONAL))
+		return
 	if(atom_integrity <= 0)
 		to_chat(M, span_warning("You cannot get in the [src], it has been destroyed!"))
 		return FALSE
@@ -173,8 +175,6 @@
 			remove_occupant(ejector)
 		mmi.set_mecha(null)
 		mmi.update_appearance()
-	setDir(SOUTH)
-	SEND_SIGNAL(src, COMSIG_MECHA_MOB_EXIT)
 	return ..()
 
 /obj/vehicle/sealed/mecha/add_occupant(mob/driver, control_flags)
@@ -183,7 +183,13 @@
 	RegisterSignal(driver, COMSIG_MOVABLE_KEYBIND_FACE_DIR, PROC_REF(on_turn), TRUE)
 	RegisterSignal(driver, COMSIG_MOB_ALTCLICKON, PROC_REF(on_click_alt))
 	. = ..()
-	update_appearance()
+	if(!.)
+		return
+	generate_equipment_actions(driver)
+	if(!(mecha_flags & MECHA_OPERATIONAL))
+		set_to_operational()
+	else
+		update_appearance()
 
 /obj/vehicle/sealed/mecha/remove_occupant(mob/driver)
 	UnregisterSignal(driver, list(
@@ -199,7 +205,10 @@
 		driver.client.view_size.resetToDefault()
 		zoom_mode = FALSE
 	. = ..()
-	update_appearance()
+	if(!length(occupants))
+		reset_to_non_operational()
+	else
+		update_appearance()
 
 /obj/vehicle/sealed/mecha/container_resist_act(mob/living/user)
 	if(isAI(user))

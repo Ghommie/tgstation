@@ -15,7 +15,7 @@
 	return
 
 /turf/closed/wall/mech_melee_attack(obj/vehicle/sealed/mecha/mecha_attacker, mob/living/user)
-	if(!user.combat_mode)
+	if(user && !user.combat_mode)
 		return
 
 	mecha_attacker.do_attack_animation(src)
@@ -36,7 +36,7 @@
 	return 100 //this is an arbitrary "damage" number since the actual damage is rng dismantle
 
 /obj/structure/mech_melee_attack(obj/vehicle/sealed/mecha/mecha_attacker, mob/living/user)
-	if(!user.combat_mode)
+	if(user && !user.combat_mode)
 		return 0
 
 	mecha_attacker.do_attack_animation(src)
@@ -52,7 +52,7 @@
 	return take_damage(mecha_attacker.force * 3, mecha_attacker.damtype, "melee", FALSE, get_dir(src, mecha_attacker)) // multiplied by 3 so we can hit objs hard but not be overpowered against mobs.
 
 /obj/machinery/mech_melee_attack(obj/vehicle/sealed/mecha/mecha_attacker, mob/living/user)
-	if(!user.combat_mode)
+	if(user && !user.combat_mode)
 		return
 
 	mecha_attacker.do_attack_animation(src)
@@ -68,7 +68,7 @@
 	return take_damage(mecha_attacker.force * 3, mecha_attacker.damtype, "melee", FALSE, get_dir(src, mecha_attacker)) // multiplied by 3 so we can hit objs hard but not be overpowered against mobs.
 
 /obj/structure/window/mech_melee_attack(obj/vehicle/sealed/mecha/mecha_attacker, mob/living/user)
-	if(!user.combat_mode)
+	if(user && !user.combat_mode)
 		return
 	if(!can_be_reached())
 		return
@@ -90,7 +90,7 @@
 	return take_damage(mecha_attacker.force * 100, mecha_attacker.damtype, "melee", FALSE, get_dir(src, mecha_attacker))
 
 /obj/vehicle/mech_melee_attack(obj/vehicle/sealed/mecha/mecha_attacker, mob/living/user)
-	if(!user.combat_mode)
+	if(user && !user.combat_mode)
 		return FALSE
 
 	mecha_attacker.do_attack_animation(src)

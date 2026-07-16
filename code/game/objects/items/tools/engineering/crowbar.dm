@@ -384,13 +384,16 @@
 		mech.balloon_alert(user, "not wielded!")
 		return
 	var/obj/item/mecha_parts/mecha_equipment/sleeper/mech_sleeper = locate() in mech
-	if((!LAZYLEN(mech.occupants) || (LAZYLEN(mech.occupants) == 1 && mech.mecha_flags & SILICON_PILOT)) && (!mech_sleeper || !mech_sleeper.patient)) //if no occupants, or only an ai
+	if(!LAZYLEN(mech.occupants) && !(mech.mecha_flags & MECHA_OPERATIONAL) && (!mech_sleeper || !mech_sleeper.patient)) //no occupants, not remote controlled and no mech sleepers patient inside.
 		mech.balloon_alert(user, "it's empty!")
+		return
+	if(LAZYLEN(mech.occupants) == 1 && (mech.mecha_flags & SILICON_PILOT))
+		mech.balloon_alert(user, "it won't budge!")
 		return
 	var/list/log_list_before = LAZYCOPY(mech.occupants)
 	if(mech_sleeper?.patient)
 		log_list_before += mech_sleeper.patient
-	user.log_message("tried to pry open [mech], located at [loc_name(mech)], which is occupied by [log_list_before.Join(", ")].", LOG_ATTACK)
+	user.log_message("tried to pry open [mech], located at [loc_name(mech)], which is occupied by [log_list_before.Join(", ") || "no one"].", LOG_ATTACK)
 	var/mech_dir = mech.dir
 	mech.balloon_alert(user, "prying open...")
 	playsound(mech, 'sound/machines/airlock/airlock_alien_prying.ogg', 100, TRUE)
@@ -400,12 +403,8 @@
 	var/list/log_list_after = LAZYCOPY(mech.occupants)
 	if(mech_sleeper?.patient)
 		log_list_after += mech_sleeper.patient
-		mech_sleeper.go_out()
-	user.log_message("pried open [mech], located at [loc_name(mech)], which was occupied by [log_list_after.Join(", ")].", LOG_ATTACK)
-	for(var/mob/living/occupant as anything in SANITIZE_LIST(mech.occupants))
-		if(isAI(occupant) || isbrain(occupant))
-			continue
-		mech.mob_exit(occupant)
+	user.log_message("pried open [mech], located at [loc_name(mech)], which was occupied by [log_list_after.Join(", ") || "no one"].", LOG_ATTACK)
+	mech.eject_everyone()
 	playsound(mech, 'sound/machines/airlock/airlockforced.ogg', 75, TRUE)
 
 /obj/item/crowbar/mechremoval/proc/extra_checks(obj/vehicle/sealed/mecha/mech, mech_dir, obj/item/mecha_parts/mecha_equipment/sleeper/mech_sleeper)

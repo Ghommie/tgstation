@@ -145,6 +145,8 @@
 
 ///Do after wrapper for mecha equipment
 /obj/item/mecha_parts/mecha_equipment/proc/do_after_mecha(atom/target, mob/user, delay, flags)
+	if(!user) //TODO delays without user
+		return FALSE
 	return do_after(user, delay, target, extra_checks = CALLBACK(src, PROC_REF(do_after_checks), target, flags))
 
 /// do after checks for the mecha equipment do afters
