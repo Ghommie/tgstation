@@ -67,6 +67,11 @@
 /// From /datum/species/replace_body(): (replacement limb)
 #define COMSIG_BODYPART_SPECIES_REPLACE "bodypart_species_replace"
 
+/// From /datum/species/get_mutant_organ_type_for_slot(): (slot, organ_holder, list/replacement_organ)
+#define COMSIG_SPECIES_GET_MUTANT_ORGAN "species_get_mutant_organ"
+/// From /datum/species/replace_body(), used to make a list of overrides to the standard replacements: (new_species, list/bodypart_overrides)
+#define COMSIG_SPECIES_REPLACE_BODY "species_replace_body"
+
 /// Sent to a limb when something *attempts* to change its surgery state (old_state, new_state, changed_states)
 #define COMSIG_BODYPART_UPDATING_SURGERY_STATE "bodypart_updating_surgery_state"
 

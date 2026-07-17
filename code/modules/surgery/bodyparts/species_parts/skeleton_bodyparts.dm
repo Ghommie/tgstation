@@ -28,6 +28,7 @@
 		TRAIT_LIMBATTACHMENT,
 		TRAIT_NO_UNDERWEAR,
 		TRAIT_XENO_IMMUNE,
+		TRAIT_PIERCEIMMUNE,
 	)
 
 ///In case this part was unfortunately aquired via butchering

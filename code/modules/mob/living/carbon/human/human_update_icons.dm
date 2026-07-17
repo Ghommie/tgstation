@@ -101,10 +101,8 @@ There are several things that need to be remembered:
 		if(digi && (uniform.supports_variations_flags & CLOTHING_DIGITIGRADE_VARIATION))
 			icon_file = DIGITIGRADE_UNIFORM_FILE
 		//Female sprites have lower priority than digitigrade sprites
-		var/chest_is_dimorphic
-		if(dna.species.sexes)
-			var/obj/item/bodypart/chest/our_chest = get_bodypart(BODY_ZONE_CHEST)
-			chest_is_dimorphic = our_chest.is_dimorphic
+		var/obj/item/bodypart/chest/our_chest = get_bodypart(BODY_ZONE_CHEST)
+		var/chest_is_dimorphic = our_chest.is_dimorphic
 		if(chest_is_dimorphic && (bodyshape & BODYSHAPE_HUMANOID) && physique == FEMALE && !(female_sprite_flags & NO_FEMALE_UNIFORM)) //Agggggggghhhhh
 			woman = TRUE
 

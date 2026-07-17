@@ -9,7 +9,7 @@
 	hud_type = /datum/hud/human
 	pressure_resistance = 25
 	buckle_lying = 0
-	mob_biotypes = MOB_ORGANIC|MOB_HUMANOID
+	mob_biotypes = NONE //dictated by the current species and other things
 	can_be_shoved_into = TRUE
 	initial_language_holder = /datum/language_holder/empty // We get stuff from our species
 	flags_1 = PREVENT_CONTENTS_EXPLOSION_1

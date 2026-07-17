@@ -4,23 +4,7 @@
 	id = SPECIES_SKELETON
 	sexes = FALSE
 	meat = /obj/item/food/meat/slab/human/mutant/skeleton
-	inherent_traits = list( // easy dismemberment, limb reattachment, no underwear and xeno immunity moved to chest bodypart traits
-		TRAIT_FAKEDEATH,
-		TRAIT_GENELESS,
-		TRAIT_NOBLOOD,
-		TRAIT_NOBREATH,
-		TRAIT_NO_DNA_COPY,
-		TRAIT_PIERCEIMMUNE,
-		TRAIT_RADIMMUNE,
-		TRAIT_RESISTCOLD,
-		TRAIT_RESISTHEAT,
-		TRAIT_RESISTHIGHPRESSURE,
-		TRAIT_RESISTLOWPRESSURE,
-		TRAIT_TOXIMMUNE,
-		TRAIT_UNHUSKABLE,
-	)
-	inherent_factions = list(FACTION_SKELETON)
-	inherent_biotypes = MOB_UNDEAD|MOB_HUMANOID|MOB_SKELETAL
+	inherent_biotypes = MOB_HUMANOID
 	mutanttongue = /obj/item/organ/tongue/bone
 	mutantstomach = /obj/item/organ/stomach/bone
 	mutantappendix = null
@@ -41,12 +25,13 @@
 		BODY_ZONE_CHEST = /obj/item/bodypart/chest/skeleton,
 	)
 
-/datum/species/skeleton/on_species_gain(mob/living/carbon/human/human_who_gained_species, datum/species/old_species, pref_load, regenerate_icons = TRUE, replace_missing = TRUE)
-	for(var/bodypart_zone in old_species.bodypart_overrides)
-		var/obj/item/bodypart/prototype = old_species.bodypart_overrides[bodypart_zone]
-		if(prototype::skeleton_part)
-			bodypart_overrides[bodypart_zone] = prototype::skeleton_part
-	return ..()
+/datum/species/skeleton/on_species_gain(mob/living/carbon/human/human, datum/species/old_species, pref_load, regenerate_icons = TRUE, replace_missing = TRUE)
+	. = ..()
+	human.AddComponentFrom(SPECIES_SKELETON, /datum/component/skeletonized_mob)
+
+/datum/species/skeleton/on_species_loss(mob/living/carbon/human/human, datum/species/new_species, pref_load)
+	. = ..()
+	human.RemoveComponentSource(SPECIES_SKELETON, /datum/component/skeletonized_mob)
 
 /datum/species/skeleton/check_roundstart_eligible()
 	if(check_holidays(HALLOWEEN))

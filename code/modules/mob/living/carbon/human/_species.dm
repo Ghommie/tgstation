@@ -245,7 +245,19 @@ GLOBAL_LIST_EMPTY(features_by_species)
 /**
  * Gets the default mutant organ for the species based on the provided slot.
  */
-/datum/species/proc/get_mutant_organ_type_for_slot(slot)
+/datum/species/proc/get_mutant_organ_type_for_slot(slot, mob/living/carbon/organ_holder)
+	if(organ_holder)
+		var/list/replacement_organ = list()
+		SEND_SIGNAL(src, COMSIG_SPECIES_GET_MUTANT_ORGAN, slot, organ_holder, replacement_organ)
+		if(length(replacement_organ))
+			var/priority = 0
+			var/chosen_type
+			for(var/organ_type in replacement_organ)
+				if(replacement_organ[organ_type] > priority)
+					chosen_type = organ_type
+					priority = replacement_organ[organ_type]
+			return chosen_type
+
 	switch(slot)
 		if(ORGAN_SLOT_BRAIN)
 			return mutantbrain
@@ -288,8 +300,8 @@ GLOBAL_LIST_EMPTY(features_by_species)
 /datum/species/proc/regenerate_organs(mob/living/carbon/organ_holder, datum/species/old_species, replace_current = TRUE, list/excluded_zones, visual_only = FALSE, replace_missing = TRUE)
 	for(var/slot in get_all_slots())
 		var/obj/item/organ/existing_organ = organ_holder.get_organ_slot(slot)
-		var/obj/item/organ/new_organ = get_mutant_organ_type_for_slot(slot)
-		var/old_organ_type = old_species?.get_mutant_organ_type_for_slot(slot)
+		var/obj/item/organ/new_organ = get_mutant_organ_type_for_slot(slot, organ_holder)
+		var/old_organ_type = old_species?.get_mutant_organ_type_for_slot(slot, organ_holder)
 
 		// if we have an extra organ that before changing that the species didnt have, remove it
 		if(!new_organ)
@@ -371,7 +383,7 @@ GLOBAL_LIST_EMPTY(features_by_species)
 	human_who_gained_species.living_flags |= STOP_OVERLAY_UPDATE_BODY_PARTS //Don't call update_body_parts() for every single bodypart overlay added.
 
 	// Drop the items the new species can't wear
-	human_who_gained_species.mob_biotypes = inherent_biotypes
+	human_who_gained_species.mob_biotypes |= inherent_biotypes
 	human_who_gained_species.butcher_results = knife_butcher_results?.Copy()
 
 	//update body zones to match what they are supposed to have
@@ -446,6 +458,7 @@ GLOBAL_LIST_EMPTY(features_by_species)
 
 	human.living_flags |= STOP_OVERLAY_UPDATE_BODY_PARTS //Don't call update_body_parts() for every single bodypart overlay removed.
 	human.butcher_results = null
+	human.mob_biotypes &= ~inherent_biotypes
 	for(var/trait in inherent_traits)
 		REMOVE_TRAIT(human, trait, SPECIES_TRAIT)
 
@@ -478,7 +491,7 @@ GLOBAL_LIST_EMPTY(features_by_species)
 	for(var/language in losing_holder.blocked_understanding)
 		human.remove_blocked_language(language, UNDERSTOOD_LANGUAGE, LANGUAGE_SPECIES)
 
-	SEND_SIGNAL(human, COMSIG_SPECIES_LOSS, src)
+	SEND_SIGNAL(human, COMSIG_SPECIES_LOSS, src, new_species)
 
 	human.living_flags &= ~STOP_OVERLAY_UPDATE_BODY_PARTS
 
@@ -1958,6 +1971,8 @@ GLOBAL_LIST_EMPTY(features_by_species)
 	if((new_species.digitigrade_customization == DIGITIGRADE_OPTIONAL && target.dna.features[FEATURE_LEGS] == DIGITIGRADE_LEGS) || new_species.digitigrade_customization == DIGITIGRADE_FORCED)
 		final_bodypart_overrides[BODY_ZONE_R_LEG] = /obj/item/bodypart/leg/right/digitigrade
 		final_bodypart_overrides[BODY_ZONE_L_LEG] = /obj/item/bodypart/leg/left/digitigrade
+
+	SEND_SIGNAL(target, COMSIG_SPECIES_REPLACE_BODY, new_species, final_bodypart_overrides)
 
 	for(var/obj/item/bodypart/old_part as anything in target.get_bodyparts())
 		if((old_part.change_exempt_flags & BP_BLOCK_CHANGE_SPECIES) || (old_part.bodypart_flags & BODYPART_IMPLANTED))
