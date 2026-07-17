@@ -38,6 +38,22 @@
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_smoke)
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_zoom)
 
+/obj/vehicle/sealed/mecha/maradeur/get_shell_circuit_components()
+	. = ..()
+	. += /obj/item/circuit_component/mecha/smoke
+
+/obj/item/circuit_component/mecha/smoke
+	display_name = "Deploy Smoke"
+	desc = "Used to deploy smoke."
+	required_mech_type = /obj/vehicle/sealed/mecha/maradeur
+	var/datum/port/input/deploy
+	var/datum/port/output/deployed
+
+/obj/item/circuit_component/mecha/smoke/populate_ports()
+	. = ..()
+	deploy = add_input_port("Deploy", PORT_TYPE_SIGNAL)
+	deployed = add_output_port("Deployed", PORT_TYPE_SIGNAL)
+
 /obj/vehicle/sealed/mecha/marauder/loaded
 	equip_by_category = list(
 		MECHA_L_ARM = /obj/item/mecha_parts/mecha_equipment/weapon/energy/pulse,

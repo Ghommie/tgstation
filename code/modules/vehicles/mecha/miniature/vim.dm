@@ -85,3 +85,19 @@
 	. = ..()
 	if(mecha_flags & LIGHTS_ON)
 		. += mutable_appearance(icon, "vim_headlights")
+
+/obj/vehicle/sealed/mecha/vim/get_shell_circuit_components()
+	. = ..()
+	. += /obj/item/circuit_component/mecha/vim
+
+/obj/item/circuit_component/mecha/vim
+	display_name = "Vim Sounds"
+	desc = "Used to make a couple noises."
+	required_mech_type = /obj/vehicle/sealed/mecha/vim
+	var/datum/port/input/chime
+	var/datum/port/output/buzz
+
+/obj/item/circuit_component/mecha/vim/populate_ports()
+	. = ..()
+	chime = add_input_port("Chime", PORT_TYPE_SIGNAL)
+	buzz = add_input_port("Buzz", PORT_TYPE_SIGNAL)

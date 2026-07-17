@@ -289,6 +289,8 @@
 		/obj/item/circuit_component/mecha/movement,
 		/obj/item/circuit_component/mecha/combat,
 	)
+	if(can_use_overclock)
+		components += /obj/item/circuit_component/mecha/overclock
 	if(max_equip_by_category[MECHA_L_ARM] || max_equip_by_category[MECHA_R_ARM])
 		components += /obj/item/circuit_component/mecha/equipment
 	return components
@@ -446,10 +448,12 @@
 		initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_toggle_cabin_seal, VEHICLE_CONTROL_SETTINGS)
 	if(can_use_overclock && overclock_action_type)
 		initialize_passenger_action_type(overclock_action_type)
-	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_toggle_lights, VEHICLE_CONTROL_SETTINGS)
+	if(mecha_flags & HAS_LIGHTS)
+		initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_toggle_lights, VEHICLE_CONTROL_SETTINGS)
 	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_toggle_safeties, VEHICLE_CONTROL_SETTINGS)
 	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_view_stats, VEHICLE_CONTROL_SETTINGS)
-	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/strafe, VEHICLE_CONTROL_DRIVE)
+	if(mecha_flags & CAN_STRAFE)
+		initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/strafe, VEHICLE_CONTROL_DRIVE)
 
 /obj/vehicle/sealed/mecha/remove_occupant(mob/M)
 	remove_all_equipment_actions(M)
@@ -582,7 +586,7 @@
 		if(!scanmod)
 			. += span_warning("It's missing a scanning module.")
 	if(!(mecha_flags & IS_ENCLOSED))
-		if(mecha_flags & SILICON_PILOT)
+		if(mecha_flags & SILICON_PILOT || !(length(occupants) && mecha_flags & MECHA_OPERATIONAL))
 			. += span_notice("[src] appears to be piloting itself...")
 		else
 			for(var/occupante in occupants)

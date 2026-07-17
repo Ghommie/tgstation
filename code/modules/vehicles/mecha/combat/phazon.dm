@@ -37,6 +37,40 @@
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_toggle_phasing)
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_switch_damtype)
 
+/obj/vehicle/sealed/mecha/phazon/get_shell_circuit_components()
+	. = ..()
+	. += /obj/item/circuit_component/mecha/phase
+	. += /obj/item/circuit_component/mecha/damtype
+
+/obj/item/circuit_component/mecha/phase
+	display_name = "Phase"
+	desc = "Used to toggle phasing."
+	required_mech_type = /obj/vehicle/sealed/mecha/phazon
+	var/datum/port/input/toggle
+	var/datum/port/output/phasing
+	var/datum/port/output/toggled
+
+/obj/item/circuit_component/mecha/phase/populate_ports()
+	. = ..()
+	toggle = add_input_port("Toggle", PORT_TYPE_SIGNAL)
+	phasing = add_output_port("Phasing", PORT_TYPE_BOOLEAN)
+	toggled = add_output_port("Toggled", PORT_TYPE_SIGNAL)
+
+/obj/item/circuit_component/mecha/damtype
+	display_name = "Cycle Damage Type"
+	desc = "Used to select the type of damage that the Phazon can deal when punching."
+	required_mech_type = /obj/vehicle/sealed/mecha/phazon
+	var/datum/port/input/cycle
+	var/datum/port/output/current_damage_type
+	var/datum/port/output/cycled
+
+/obj/item/circuit_component/mecha/damtype/populate_ports()
+	. = ..()
+	cycle = add_input_port("Cycle", PORT_TYPE_SIGNAL)
+	current_damage_type = add_output_port("Damage Type", PORT_TYPE_STRING)
+	cycled = add_output_port("Cycled", PORT_TYPE_SIGNAL)
+
+
 /datum/action/vehicle/sealed/mecha/mech_switch_damtype
 	name = "Reconfigure arm microtool arrays"
 	button_icon_state = "mech_damtype_brute"

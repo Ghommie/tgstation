@@ -46,6 +46,20 @@
 	. = ..()
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_defense_mode)
 
+/obj/item/circuit_component/mecha/defense_mode
+	display_name = "Toggle Defense Mode"
+	desc = "Enable of disable an emergency shield that blocks all attacks from the faced direction."
+	required_mech_type = /obj/vehicle/sealed/mecha/durand
+	var/datum/port/input/toggle
+	var/datum/port/output/defense
+	var/datum/port/output/toggled
+
+/obj/item/circuit_component/mecha/defense_mode/populate_ports()
+	. = ..()
+	toggle = add_input_port("Toggle", PORT_TYPE_SIGNAL)
+	defense = add_output_port("Defense Mode", PORT_TYPE_STRING)
+	toggled = add_output_port("Toggled", PORT_TYPE_SIGNAL)
+
 /obj/vehicle/sealed/mecha/durand/process()
 	. = ..()
 	if(defense_mode && !use_energy(0.01 * STANDARD_CELL_CHARGE)) //Defence mode can only be on with a occupant so we check if one of them can toggle it and toggle

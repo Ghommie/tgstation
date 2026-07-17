@@ -49,6 +49,9 @@
 	fire = 100
 	acid = 100
 
+/obj/vehicle/sealed/mecha/savannah_ivanov/get_shell_circuit_components()
+	return null //It's a pretty unique mecha with features that would need to be reworked heavily to work with circuits, plus it defeats the gimmick of requiring two pilots.
+
 /obj/vehicle/sealed/mecha/savannah_ivanov/get_mecha_occupancy_state()
 	var/driver_present = driver_amount() != 0
 	var/gunner_present = return_amount_of_controllers_with_flag(VEHICLE_CONTROL_EQUIPMENT) > 0
