@@ -631,9 +631,6 @@
 //Turns a mob black, flashes a skeleton overlay
 //Just like a cartoon!
 /mob/living/carbon/human/proc/electrocution_animation(anim_duration)
-	var/zap_appearance
-
-	// If we have a species, we need to handle mutant parts and stuff
 	add_atom_colour(COLOR_BLACK, TEMPORARY_COLOUR_PRIORITY)
 	var/atom/movable/electrocuted/appearance = get_electrocuted_appearance()
 	appearance.add_to_mob(src)
@@ -660,7 +657,7 @@
 	for(var/obj/item/organ/organ in organs)
 		if(!organ.visual)
 			continue
-		var/electrocuted_apperance = part.get_electrocuted_appearance()
+		var/electrocuted_apperance = organ.get_electrocuted_appearance()
 		if(isnull(electrocuted_apperance))
 			continue
 		parts_to_draw += electrocuted_apperance
@@ -671,7 +668,7 @@
 	var/id = parts_to_draw.Join("-")
 	id += "-[mob_height]"
 
-	var/atom/movable/electrocuted/appearance = GLOB.cached_electrocuted_visuals[id]
+	var/atom/movable/electrocuted/appearance = GLOB.cached_electrocuted_appearances[id]
 	if(appearance)
 		return appearance
 
@@ -694,7 +691,7 @@
 		apply_height(actual_overlay, initial(overlay.offset_location))
 		appearance.overlays += actual_overlay
 
-	GLOB.cached_electrocuted_visuals[id] = appearance
+	GLOB.cached_electrocuted_appearances[id] = appearance
 	return appearance
 
 GLOBAL_LIST_EMPTY(cached_electrocuted_appearances)
