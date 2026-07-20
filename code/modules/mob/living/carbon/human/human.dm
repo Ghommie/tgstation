@@ -631,29 +631,94 @@
 //Turns a mob black, flashes a skeleton overlay
 //Just like a cartoon!
 /mob/living/carbon/human/proc/electrocution_animation(anim_duration)
-	var/mutable_appearance/zap_appearance
+	var/zap_appearance
 
 	// If we have a species, we need to handle mutant parts and stuff
-	if(dna?.species)
-		add_atom_colour(COLOR_BLACK, TEMPORARY_COLOUR_PRIORITY)
-		var/mutable_appearance/shock_animation_dna = mutable_appearance(icon, "electrocuted_base", appearance_flags = RESET_COLOR|KEEP_APART)
-		apply_height(shock_animation_dna, ENTIRE_BODY)
-		zap_appearance = shock_animation_dna
+	add_atom_colour(COLOR_BLACK, TEMPORARY_COLOUR_PRIORITY)
+	var/atom/movable/electrocuted/appearance = get_electrocuted_appearance()
+	appearance.add_to_mob(src)
 
-	// Otherwise do a generic animation
-	else
-		var/static/mutable_appearance/shock_animation_generic
-		if(!shock_animation_generic)
-			shock_animation_generic = mutable_appearance(icon, "electrocuted_generic")
-			shock_animation_generic.appearance_flags |= RESET_COLOR|KEEP_APART
-		zap_appearance = shock_animation_generic
+	addtimer(CALLBACK(src, PROC_REF(end_electrocution_animation), appearance), anim_duration)
 
-	add_overlay(zap_appearance)
-	addtimer(CALLBACK(src, PROC_REF(end_electrocution_animation), zap_appearance), anim_duration)
+/obj/item/bodypart/proc/get_electrocuted_appearance()
+	return skeleton_part
 
-/mob/living/carbon/human/proc/end_electrocution_animation(mutable_appearance/MA)
+/obj/item/organ/proc/get_electrocuted_appearance()
+	return null
+
+/mob/living/carbon/human/proc/get_electrocuted_appearance()
+	var/list/parts_to_draw = list()
+	var/list/bodyparts_to_draw = list()
+	var/list/body_overlays_to_draw = list()
+	for(var/obj/item/bodypart/part in get_bodyparts())
+		var/electrocuted_apperance = part.get_electrocuted_appearance()
+		if(isnull(electrocuted_apperance))
+			continue
+		parts_to_draw += electrocuted_apperance
+		bodyparts_to_draw += electrocuted_apperance
+
+	for(var/obj/item/organ/organ in organs)
+		if(!organ.visual)
+			continue
+		var/electrocuted_apperance = part.get_electrocuted_appearance()
+		if(isnull(electrocuted_apperance))
+			continue
+		parts_to_draw += electrocuted_apperance
+		body_overlays_to_draw += electrocuted_apperance
+
+	sortTim(parts_to_draw, cmp = GLOBAL_PROC_REF(cmp_typepaths_asc))
+
+	var/id = parts_to_draw.Join("-")
+	id += "-[mob_height]"
+
+	var/atom/movable/electrocuted/appearance = GLOB.cached_electrocuted_visuals[id]
+	if(appearance)
+		return appearance
+
+	appearance = new
+
+	var/mutable_appearance/body_appearance = new
+	for(var/obj/item/bodypart/part in bodyparts_to_draw)
+		//TODO BUILDING THE APPEARANCE
+		var/mutable_appearance/overlay = new (part::icon, "[part::limb_id]_[part::body_zone]")
+		//TODO BUILDING THE APPEARANCE
+		body_appearance += overlay
+
+	apply_height(body_appearance, ENTIRE_BODY)
+	appearance.overlays += body_appearance
+
+	for(var/datum/bodypart_overlay/overlay as anything in body_overlays_to_draw)
+		//TODO BUILDING THE APPEARANCE
+		var/mutable_appearance/actual_overlay = new
+		//TODO BUILDING THE APPEARANCE
+		apply_height(actual_overlay, initial(overlay.offset_location))
+		appearance.overlays += actual_overlay
+
+	GLOB.cached_electrocuted_visuals[id] = appearance
+	return appearance
+
+GLOBAL_LIST_EMPTY(cached_electrocuted_appearances)
+
+/atom/movable/electrocuted
+	appearance_flags = RESET_COLOR|KEEP_APART
+	vis_flags = VIS_INHERIT_LAYER | VIS_INHERIT_PLANE | VIS_INHERIT_ID | VIS_INHERIT_DIR
+
+/atom/movable/electrocuted/proc/add_to_mob(mob/living/target)
+	if(!length(vis_locs)) //we aren't attached to anyone yet, begin animating
+		animate(src, alpha = 255, time = 0.16 SECONDS, loop = -1) //wait
+		animate(alpha = 0, time = 0 SECONDS) //now you can't see me
+		animate(alpha = 0, time = 0.08 SECONDS) //wait
+		animate(alpha = 255, time = 0 SECONDS) //now you see me
+	target.vis_contents += src
+
+/atom/movable/electrocuted/proc/remove_from_mob(mob/living/target)
+	target.vis_contents -= src
+	if(!length(vis_locs)) //we aren't attached to anyone anymore, stop processing
+		animate(src, alpha = 255, time = 0 SECONDS) //this should end the animation loop
+
+/mob/living/carbon/human/proc/end_electrocution_animation(atom/movable/electrocuted/appearance)
 	remove_atom_colour(TEMPORARY_COLOUR_PRIORITY, COLOR_BLACK)
-	cut_overlay(MA)
+	appearance.remove_from_mob(src)
 
 /mob/living/carbon/human/resist_restraints()
 	if(wear_suit?.breakouttime)

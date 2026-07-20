@@ -62,13 +62,36 @@
 	icon_state = "short"
 	spine_key = NONE
 
+//For skeletonized lizard people
+/datum/sprite_accessory/tails/lizard/skeleton
+	name = "Skeleton"
+	icon_state = "skeleton"
+	spine_key = NONE
+	locked = TRUE
+	natural_spawn = FALSE
+	color_src = FALSE
+
+/datum/sprite_accessory/tails/lizard/skeleton/short
+	name = "Skeleton Short"
+	icon_state = "skele_short"
+
 /datum/sprite_accessory/tails/felinid/cat
 	name = "Cat"
 	icon = 'icons/mob/human/cat_features.dmi'
 	icon_state = "default"
 	color_src = HAIR_COLOR
 
+//For skeletonized felinids
+/datum/sprite_accessory/tails/felinid/skeleton
+	name = "Skeleton"
+	icon_state = "skeleton"
+	spine_key = NONE
+	locked = TRUE
+	natural_spawn = FALSE
+	color_src = FALSE
+
 /datum/sprite_accessory/tails/monkey
+	color_src = FALSE
 
 /datum/sprite_accessory/tails/monkey/none
 	name = SPRITE_ACCESSORY_NONE
@@ -79,6 +102,13 @@
 	name = "Monkey"
 	icon = 'icons/mob/human/species/monkey/monkey_tail.dmi'
 	icon_state = "default"
+
+//For skeletonized monkeys
+/datum/sprite_accessory/tails/monkey/skeleton
+	name = "Skeleton"
+	icon_state = "skeleton"
+	locked = TRUE
+	natural_spawn = FALSE
 	color_src = FALSE
 
 /datum/sprite_accessory/tails/xeno
