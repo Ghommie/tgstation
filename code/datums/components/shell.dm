@@ -310,7 +310,7 @@
 		return
 	locked = FALSE
 	attached_circuit = circuitboard
-	SEND_SIGNAL(src, COMSIG_SHELL_CIRCUIT_ATTACHED)
+	SEND_SIGNAL(src, COMSIG_SHELL_CIRCUIT_ATTACHED, circuitboard)
 	if(!(shell_flags & SHELL_FLAG_CIRCUIT_UNREMOVABLE) && !circuitboard.admin_only)
 		RegisterSignal(circuitboard, COMSIG_MOVABLE_MOVED, PROC_REF(on_circuit_moved))
 	if(shell_flags & SHELL_FLAG_REQUIRE_ANCHOR)
@@ -358,7 +358,7 @@
 		attached_circuit.remove_component(to_remove)
 		to_remove.moveToNullspace()
 	attached_circuit.set_locked(FALSE)
-	SEND_SIGNAL(src, COMSIG_SHELL_CIRCUIT_REMOVED)
+	SEND_SIGNAL(src, COMSIG_SHELL_CIRCUIT_REMOVED, attached_circuit)
 	attached_circuit = null
 
 /datum/component/shell/proc/on_atom_usb_cable_try_attach(atom/source, obj/item/usb_cable/usb_cable, mob/user)

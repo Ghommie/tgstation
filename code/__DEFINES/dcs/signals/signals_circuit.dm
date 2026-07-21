@@ -88,6 +88,9 @@
 /// Called when an NFC sender sends data to this circuit
 #define COMSIG_CIRCUIT_NFC_DATA_SENT "circuit_nfc_data_receive"
 
+/// From /obj/item/circuit_component/proc/get_ui_notices(): (examine_list)
+#define COMSIG_CIRCUIT_GET_UI_NOTICES "circuit_get_ui_notices"
+
 ///Sent to the shell component when a circuit is attached.
 #define COMSIG_SHELL_CIRCUIT_ATTACHED "shell_circuit_attached"
 ///Sent to the shell component when a circuit is removed.

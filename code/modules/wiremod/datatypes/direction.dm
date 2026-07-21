@@ -22,6 +22,21 @@
 	datatype_flags = DATATYPE_FLAG_ALLOW_MANUAL_INPUT
 	can_receive_from = list(PORT_TYPE_STRING, PORT_TYPE_NUMBER)
 
+/datum/circuit_datatype/direction/on_gain(datum/port/port)
+	RegisterSignal(port.connected_component, COMSIG_CIRCUIT_GET_UI_NOTICES, PROC_REF(introduce_direction_ports), override = TRUE)
+
+/datum/circuit_datatype/direction/on_loss(datum/port/port)
+	for(var/datum/port/other_port as anything in (port.connected_component.input_ports + port.connected_component.output_ports - port))
+		if(other_port.datatype == src)
+			return
+	UnregisterSignal(port.connected_component, COMSIG_CIRCUIT_GET_UI_NOTICES)
+
+/datum/circuit_datatype/direction/proc/introduce_direction_ports(datum/port/source, list/examine_list)
+	SIGNAL_HANDLER
+	examine_list += source.connected_component.create_ui_notice("Direction ports utilize a binary numbers to represent direction", "info", "circle-arrow-right")
+	examine_list += source.connected_component.create_ui_notice("[NORTH] is 'north', [SOUTH] is 'south, [EAST] is 'east', [WEST] is 'west', [UP] is 'up', [DOWN] is 'down'", "info", "circle-arrow-right")
+	examine_list += source.connected_component.create_ui_notice("Directions will be converted into text (e.g. [SOUTH] becomes \"south\") when used on string ports, and viceversa.", "info", "circle-arrow-right")
+
 /datum/circuit_datatype/direction/convert_value(datum/port/port, value_to_convert, force)
 	var/allowed_directions = SOUTH|NORTH|EAST|WEST|UP|DOWN
 	var/list/dirs_blacklist

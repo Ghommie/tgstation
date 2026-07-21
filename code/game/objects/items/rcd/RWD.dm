@@ -1,5 +1,6 @@
 //This represents the amount of materials (both iron and glass that the max_amount of cable would amount to
-#define MAX_CABLE_AMOUNT (SMALL_MATERIAL_AMOUNT * 0.1 * /obj/item/rwd/loaded::max_amount)
+#define MAX_CABLE_MATERIAL_AMOUNT (SMALL_MATERIAL_AMOUNT * 0.1 * MAX_CABLE_AMOUNT)
+#define MAX_CABLE_AMOUNT 210
 
 /obj/item/rwd
 	name = "rapid wiring device"
@@ -18,7 +19,7 @@
 	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5 - MAX_CABLE_AMOUNT, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2.5 - MAX_CABLE_AMOUNT)
 
 	/// maximum amount of cable this device can hold
-	var/max_amount = 210
+	var/max_amount = MAX_CABLE_AMOUNT
 	/// current amount of cable in the machine
 	var/current_amount = 0
 	/// are we dual wielding this machine
@@ -32,6 +33,7 @@
 	/// radial menu to select cable layer
 	var/list/radial_menu = null
 
+#undef MAX_CABLE_MATERIAL_AMOUNT
 #undef MAX_CABLE_AMOUNT
 
 /obj/item/rwd/Initialize(mapload)

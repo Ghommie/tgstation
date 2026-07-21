@@ -225,6 +225,8 @@ GLOBAL_LIST_EMPTY_TYPED(integrated_circuits, /obj/item/integrated_circuit)
  * * new_value - A boolean that determines if the circuit is on or not.
  **/
 /obj/item/integrated_circuit/proc/set_on(new_value)
+	if(new_value == on)
+		return
 	SEND_SIGNAL(src, COMSIG_CIRCUIT_SET_ON, new_value)
 	on = new_value
 

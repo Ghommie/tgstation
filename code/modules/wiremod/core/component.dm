@@ -81,11 +81,11 @@
 	return add_input_port(name, PORT_TYPE_OPTION, order = order, trigger = trigger, port_type = /datum/port/input/option, extra_args = list("possible_options" = list_to_use))
 
 /// Extension of add_input_port. Used for direction ports to eliminate the need to make signal ports for every direction
-/obj/item/circuit_component/proc/add_direction_input_port(name, allowed_dirs, list/dirs_blacklist, order = 1, trigger = PROC_REF(input_received))
+/obj/item/circuit_component/proc/add_direction_input_port(name, allowed_dirs = NORTH|EAST|SOUTH|WEST|UP|DOWN, list/dirs_blacklist, order = 1, trigger = PROC_REF(input_received))
 	return add_input_port(name, PORT_TYPE_DIRECTION, order = order, trigger = trigger, port_type = /datum/port/input/direction, extra_args = list("allowed_dirs" = allowed_dirs, "dirs_blacklist" = dirs_blacklist))
 
 /// Extension of add_output_port. Used for direction ports to eliminate the need to make signal ports for every direction
-/obj/item/circuit_component/proc/add_direction_output_port(name, allowed_dirs, list/dirs_blacklist, order = 1)
+/obj/item/circuit_component/proc/add_direction_output_port(name, allowed_dirs = NORTH|EAST|SOUTH|WEST|UP|DOWN, list/dirs_blacklist, order = 1)
 	return add_output_port(name, PORT_TYPE_DIRECTION, order = order, port_type = /datum/port/output/direction, extra_args = list("allowed_dirs" = allowed_dirs, "dirs_blacklist" = dirs_blacklist))
 
 /obj/item/circuit_component/Initialize(mapload)
@@ -372,6 +372,7 @@
 	if(length(input_ports))
 		. += create_ui_notice("Energy Usage Per Input: [display_energy(energy_usage_per_input)]", "orange", "bolt")
 
+	SEND_SIGNAL(src, COMSIG_CIRCUIT_GET_UI_NOTICES, .)
 
 /**
  * Called when a special button is pressed on this component in the UI.
