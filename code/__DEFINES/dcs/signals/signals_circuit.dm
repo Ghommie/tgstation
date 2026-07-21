@@ -98,3 +98,8 @@
 
 /// Called when a usb port unregisters signals from a circuit or shell (atom/movable/old_physical_object)
 #define COMSIG_USB_PORT_UNREGISTER_PHYSICAL_OBJECT "usb_port_unregister_physical_object"
+
+/// from /obj/item/joystick/proc/press_button(): (action_type, mob/user)
+#define COMSIG_JOYSTICK_BUTTON_PRESSED "joystick_button_pressed"
+/// from /obj/item/joystick/proc/release_button(): (action_type, mob/user)
+#define COMSIG_JOYSTICK_BUTTON_RELEASED "joystick_button_released"

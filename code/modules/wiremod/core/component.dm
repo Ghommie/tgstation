@@ -80,6 +80,14 @@
 /obj/item/circuit_component/proc/add_option_port(name, list/list_to_use, order = 0, trigger = PROC_REF(input_received))
 	return add_input_port(name, PORT_TYPE_OPTION, order = order, trigger = trigger, port_type = /datum/port/input/option, extra_args = list("possible_options" = list_to_use))
 
+/// Extension of add_input_port. Used for direction ports to eliminate the need to make signal ports for every direction
+/obj/item/circuit_component/proc/add_direction_input_port(name, allowed_dirs, list/dirs_blacklist, order = 1, trigger = PROC_REF(input_received))
+	return add_input_port(name, PORT_TYPE_DIRECTION, order = order, trigger = trigger, port_type = /datum/port/input/direction, extra_args = list("allowed_dirs" = allowed_dirs, "dirs_blacklist" = dirs_blacklist))
+
+/// Extension of add_output_port. Used for direction ports to eliminate the need to make signal ports for every direction
+/obj/item/circuit_component/proc/add_direction_output_port(name, allowed_dirs, list/dirs_blacklist, order = 1)
+	return add_output_port(name, PORT_TYPE_DIRECTION, order = order, port_type = /datum/port/output/direction, extra_args = list("allowed_dirs" = allowed_dirs, "dirs_blacklist" = dirs_blacklist))
+
 /obj/item/circuit_component/Initialize(mapload)
 	. = ..()
 	if(name == COMPONENT_DEFAULT_NAME)
@@ -203,10 +211,12 @@
  * * name - The name of the output port
  * * type - The datatype it handles.
  */
-/obj/item/circuit_component/proc/add_output_port(name, type, order = 1)
+/obj/item/circuit_component/proc/add_output_port(name, type, order = 1, port_type = /datum/port/output, extra_args = null)
 	var/list/arguments = list(src)
 	arguments += args
-	var/datum/port/output/output_port = new(arglist(arguments))
+	if(extra_args)
+		arguments += extra_args
+	var/datum/port/output/output_port = new port_type(arglist(arguments))
 	output_ports += output_port
 	sortTim(output_ports, GLOBAL_PROC_REF(cmp_port_order_asc))
 	if(parent)

@@ -287,7 +287,7 @@
 		/obj/item/circuit_component/mecha/main,
 		/obj/item/circuit_component/mecha/actions,
 		/obj/item/circuit_component/mecha/movement,
-		/obj/item/circuit_component/mecha/combat,
+		/obj/item/circuit_component/mecha/punch,
 	)
 	if(can_use_overclock)
 		components += /obj/item/circuit_component/mecha/overclock

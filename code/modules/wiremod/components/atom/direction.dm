@@ -11,15 +11,11 @@
 	/// The input port
 	var/datum/port/input/input_port
 
-	/// The result from the output
-	var/datum/port/output/output
+	// Directions output
+	var/datum/port/output/direction
+
 	var/datum/port/output/distance
 
-	// Directions outputs
-	var/datum/port/output/north
-	var/datum/port/output/south
-	var/datum/port/output/east
-	var/datum/port/output/west
 
 	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL|CIRCUIT_FLAG_OUTPUT_SIGNAL
 
@@ -33,13 +29,8 @@
 /obj/item/circuit_component/direction/populate_ports()
 	input_port = add_input_port("Targeted Entity", PORT_TYPE_ATOM)
 
-	output = add_output_port("Direction", PORT_TYPE_STRING)
+	direction = add_direction_output_port("Direction", ALL)
 	distance = add_output_port("Distance", PORT_TYPE_NUMBER)
-
-	north = add_output_port("North", PORT_TYPE_SIGNAL)
-	east = add_output_port("East", PORT_TYPE_SIGNAL)
-	south = add_output_port("South", PORT_TYPE_SIGNAL)
-	west = add_output_port("West", PORT_TYPE_SIGNAL)
 
 /obj/item/circuit_component/direction/input_received(datum/port/input/port)
 
@@ -50,20 +41,10 @@
 	var/measured_distance = get_dist(location, object)
 
 	if(object.z != location.z || measured_distance > max_range)
-		output.set_output(null)
+		direction.set_output(NONE)
 		return
 
-	var/direction = get_dir(location, get_turf(object))
-	output.set_output(dir2text(direction))
-
-	if(direction & NORTH)
-		north.set_output(COMPONENT_SIGNAL)
-	if(direction & SOUTH)
-		south.set_output(COMPONENT_SIGNAL)
-	if(direction & EAST)
-		east.set_output(COMPONENT_SIGNAL)
-	if(direction & WEST)
-		west.set_output(COMPONENT_SIGNAL)
+	var/dir_value = get_dir(location, get_turf(object))
+	direction.set_output(dir_value)
 
 	distance.set_output(measured_distance)
-

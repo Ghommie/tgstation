@@ -49,20 +49,14 @@
 	display_name = "Drone"
 	desc = "Used to send movement output signals to the drone shell."
 
-	/// The inputs to allow for the drone to move
-	var/datum/port/input/north
-	var/datum/port/input/east
-	var/datum/port/input/south
-	var/datum/port/input/west
+	/// The input to allow for the drone to move
+	var/datum/port/input/direction
 
 	// Done like this so that travelling diagonally is more simple
-	COOLDOWN_DECLARE(north_delay)
-	COOLDOWN_DECLARE(east_delay)
-	COOLDOWN_DECLARE(south_delay)
-	COOLDOWN_DECLARE(west_delay)
+	COOLDOWN_DECLARE(move_delay)
 
 	/// Delay between each movement
-	var/move_delay = 0.2 SECONDS
+	var/delay_duration = 0.2 SECONDS
 
 /obj/item/circuit_component/bot_circuit/register_shell(atom/movable/shell)
 	. = ..()
@@ -80,39 +74,23 @@
 	charge_cell.Invoke(parent.cell, seconds_per_tick)
 
 /obj/item/circuit_component/bot_circuit/populate_ports()
-	north = add_input_port("Move North", PORT_TYPE_SIGNAL)
-	east = add_input_port("Move East", PORT_TYPE_SIGNAL)
-	south = add_input_port("Move South", PORT_TYPE_SIGNAL)
-	west = add_input_port("Move West", PORT_TYPE_SIGNAL)
+	direction = add_direction_input_port("Move", NORTH|EAST|SOUTH|WEST, list(NORTH|SOUTH, WEST|EAST))
 
 /obj/item/circuit_component/bot_circuit/input_received(datum/port/input/port)
-
 	var/mob/living/shell = parent.shell
-	if(!istype(shell) || shell.stat)
+	if(!istype(shell) || shell.stat || !COOLDOWN_FINISHED(src, move_delay))
 		return
 
-	var/direction
-
-	if(COMPONENT_TRIGGERED_BY(north, port) && COOLDOWN_FINISHED(src, north_delay))
-		direction = NORTH
-		COOLDOWN_START(src, north_delay, move_delay)
-	else if(COMPONENT_TRIGGERED_BY(east, port) && COOLDOWN_FINISHED(src, east_delay))
-		direction = EAST
-		COOLDOWN_START(src, east_delay, move_delay)
-	else if(COMPONENT_TRIGGERED_BY(south, port) && COOLDOWN_FINISHED(src, south_delay))
-		direction = SOUTH
-		COOLDOWN_START(src, south_delay, move_delay)
-	else if(COMPONENT_TRIGGERED_BY(west, port) && COOLDOWN_FINISHED(src, west_delay))
-		direction = WEST
-		COOLDOWN_START(src, west_delay, move_delay)
-
-	if(!direction)
+	var/dir_value = direction.value
+	if(!dir_value)
 		return
+
+	COOLDOWN_START(src, move_delay, delay_duration)
 
 	if(ismovable(shell.loc)) //Inside an object, tell it we moved
 		var/atom/loc_atom = shell.loc
-		loc_atom.relaymove(shell, direction)
+		loc_atom.relaymove(shell, dir_value)
 		return
 
-	if(shell.Process_Spacemove(direction))
-		shell.Move(get_step(shell, direction), direction)
+	if(shell.Process_Spacemove(dir_value))
+		shell.Move(get_step(shell, dir_value), dir_value)

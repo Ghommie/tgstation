@@ -2,6 +2,7 @@
 	/// The mech we are attached to
 	var/obj/vehicle/sealed/mecha/mech
 	var/required_mech_type = /datum/action/vehicle/sealed/mecha
+	var/requires_mech_on = TRUE
 	abstract_type = /obj/item/circuit_component/mecha
 
 /obj/item/circuit_component/mecha/register_shell(atom/movable/shell)
@@ -9,8 +10,12 @@
 	if(istype(shell, required_mech_type))
 		mech = shell
 
+/obj/item/circuit_component/mecha/should_receive_input(datum/port/input/port)
 	if(isnull(mech))
-		return
+		return FALSE
+	if(requires_mech_on && !(mech.mecha_flags & MECHA_OPERATIONAL))
+		return FALSE
+	return ..()
 
 /obj/item/circuit_component/mecha/unregister_shell(atom/movable/shell)
 	mech = null
@@ -19,6 +24,7 @@
 /obj/item/circuit_component/mecha/main
 	display_name = "Engagement"
 	desc = "For engaging and disengaging an exosuit, even if it doesn't have an occupant inside."
+	requires_mech_on = FALSE
 
 	///Boot up the mecha, even without an occupant
 	var/datum/port/input/boot
@@ -107,11 +113,9 @@
 /obj/item/circuit_component/mecha/movement
 	display_name = "Movement"
 	desc = "Used to control movement of an exosuit in the four cardinal directions."
+	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL
 
-	var/datum/port/input/up
-	var/datum/port/input/right
-	var/datum/port/input/down
-	var/datum/port/input/left
+	var/datum/port/input/direction
 
 	var/datum/port/output/moved
 	var/datum/port/output/movement_dir
@@ -119,12 +123,11 @@
 	var/datum/port/output/dir_changed
 	var/datum/port/output/current_dir
 
+	var/planned_direction = NONE
+
 /obj/item/circuit_component/mecha/movement/populate_ports()
 	. = ..()
-	up = add_input_port("Up", PORT_TYPE_SIGNAL)
-	right = add_input_port("Right", PORT_TYPE_SIGNAL)
-	down = add_input_port("Down", PORT_TYPE_SIGNAL)
-	left = add_input_port("Left", PORT_TYPE_SIGNAL)
+	direction = add_input_port("Direction", PORT_TYPE_DIRECTION)
 
 	moved = add_output_port("Moved", PORT_TYPE_SIGNAL)
 	movement_dir = add_output_port("Movement Direction", PORT_TYPE_STRING)
@@ -132,35 +135,31 @@
 	dir_changed = add_output_port("Direction Changed", PORT_TYPE_SIGNAL)
 	current_dir = add_output_port("Current Direction", PORT_TYPE_STRING)
 
-/obj/item/circuit_component/mecha/combat
-	display_name = "Combat"
-	desc = "Used to control basic combat actions with an exosuit."
+/obj/item/circuit_component/mecha/movement/input_received(datum/port/input/port, list/return_values)
+	var/chosen_dir = direction.value
+	if(!chosen_dir)
+		return
+	mech.vehicle_move(chosen_dir)
 
-	///Punches whatever mob, wall or structure (in order of priority) in front of us when triggered.
-	var/datum/port/input/punch
+/obj/item/circuit_component/mecha/punch
+	display_name = "Punch"
+	desc = "For when you just want to punch things with your exosuit."
+	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL|CIRCUIT_FLAG_OUTPUT_SIGNAL
 
-	///Signal sent when the punch action is done.
-	var/datum/port/output/punched
 	///The punched atom.
 	var/datum/port/output/punched_atom
 
-/obj/item/circuit_component/mecha/combat/populate_ports()
+/obj/item/circuit_component/mecha/punch/populate_ports()
 	. = ..()
-	punch = add_input_port("Punch", PORT_TYPE_SIGNAL)
-
-	punched = add_output_port("Has Punched", PORT_TYPE_SIGNAL)
 	punched_atom = add_output_port("Punched Entity", PORT_TYPE_ATOM)
 
 /obj/item/circuit_component/mecha/overclock
 	display_name = "Overclock"
 	desc = "Toggles overclock on and off."
+	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL|CIRCUIT_FLAG_OUTPUT_SIGNAL
 
-	var/datum/port/input/toggle
 	var/datum/port/output/overclocked
-	var/datum/port/output/toggled
 
 /obj/item/circuit_component/mecha/overclock/populate_ports()
 	. = ..()
-	toggle = add_input_port("Toggle", PORT_TYPE_SIGNAL)
 	overclocked = add_output_port("Overclocked", PORT_TYPE_BOOLEAN)
-	toggled = add_output_port("Toggled", PORT_TYPE_SIGNAL)

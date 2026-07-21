@@ -272,6 +272,8 @@
 
 /// from /mob/proc/key_down(): (key, client/client, full_key)
 #define COMSIG_MOB_KEYDOWN "mob_key_down"
+/// from /mob/proc/key_up(): (key, client/client)
+#define COMSIG_MOB_KEYUP "mob_key_up"
 
 /// from /mob/Process_Spacemove(movement_dir, continuous_move): (movement_dir, continuous_move, atom/backup)
 #define COMSIG_MOB_ATTEMPT_HALT_SPACEMOVE "mob_attempt_halt_spacemove"

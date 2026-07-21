@@ -35,6 +35,10 @@
 			return "northwest"
 		if(SOUTHWEST)
 			return "southwest"
+		if(UP)
+			return "up"
+		if(DOWN)
+			return "down"
 
 	return NONE
 
@@ -57,8 +61,36 @@
 			return SOUTHEAST
 		if("SOUTHWEST")
 			return SOUTHWEST
+		if("UP")
+			return UP
+		if("DOWN")
+			return DOWN
 
 	return NONE
+
+//Turns text into proper directions. This version also supports shorthands
+/proc/shorthand_text2dir(direction)
+	switch(uppertext(direction))
+		if("NORTH", "N")
+			return NORTH
+		if("SOUTH", "S")
+			return SOUTH
+		if("EAST", "E")
+			return EAST
+		if("WEST", "W")
+			return WEST
+		if("NORTHEAST", "NE")
+			return NORTHEAST
+		if("NORTHWEST", "NW")
+			return NORTHWEST
+		if("SOUTHEAST", "SE")
+			return SOUTHEAST
+		if("SOUTHWEST", "SW")
+			return SOUTHWEST
+		if("UP", "U")
+			return UP
+		if("DOWN", "D")
+			return DOWN
 
 //Converts an angle (degrees) into a ss13 direction
 GLOBAL_LIST_INIT(modulo_angle_to_dir, list(NORTH,NORTHEAST,EAST,SOUTHEAST,SOUTH,SOUTHWEST,WEST,NORTHWEST))

@@ -13,5 +13,6 @@
 	// So that they can't easily get the name like this.
 	if(isatom(value_to_convert))
 		return PORT_TYPE_ATOM
-	else
-		return copytext("[value_to_convert]", 1, PORT_MAX_STRING_LENGTH)
+	if(port.datatype == PORT_TYPE_DIRECTION)
+		return dir2text(value_to_convert)
+	return copytext("[value_to_convert]", 1, PORT_MAX_STRING_LENGTH)

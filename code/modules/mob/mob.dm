@@ -1612,6 +1612,10 @@ GAME_VERB_HIDDEN(/mob, DisDblClick, ".dblclick", argu = null as anything, sec = 
 	..()
 	SEND_SIGNAL(src, COMSIG_MOB_KEYDOWN, key, client, full_key)
 
+/mob/key_down(key, client/user)
+	..()
+	SEND_SIGNAL(src, COMSIG_MOB_KEYUP, key, client)
+
 /mob/proc/setup_hud_traits()
 	for(var/hud_trait in GLOB.trait_to_hud)
 		RegisterSignal(src, SIGNAL_ADDTRAIT(hud_trait), PROC_REF(hud_trait_enabled))

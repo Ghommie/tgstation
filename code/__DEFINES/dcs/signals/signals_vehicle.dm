@@ -34,3 +34,5 @@
 #define COMSIG_MECHA_VEHICULAR_MOVE "mecha_vehicular_move"
 /// From /obj/vehicle/sealed/mecha/set_safety(): ()
 #define COMSIG_MECH_SAFETIES_TOGGLE "mech_safeties_toggle"
+/// From /obj/vehicle/sealed/mecha/phazon/change_damage_type(): ()
+#define COMSIG_MECH_CHANGE_DAMAGE_TYPE "mech_change_damage_type"

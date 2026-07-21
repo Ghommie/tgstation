@@ -31,6 +31,8 @@
 #define PORT_TYPE_OPTION "option"
 /// Boolean datatype. Derivative of number.
 #define PORT_TYPE_BOOLEAN "boolean"
+/// Direction datatype. Derivate of number.
+#define PORT_TYPE_DIRECTION "direction"
 
 // Composite datatypes
 #define PORT_COMPOSITE_TYPE_LIST "list"
