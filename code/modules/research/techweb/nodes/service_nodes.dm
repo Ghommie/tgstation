@@ -111,6 +111,7 @@
 		"arcade_battle",
 		"arcade_orion",
 		"slotmachine",
+		"joystick_shell",
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = TECHWEB_TIER_2_POINTS)
 	discount_experiments = list(/datum/experiment/physical/arcade_winner = TECHWEB_TIER_2_POINTS)

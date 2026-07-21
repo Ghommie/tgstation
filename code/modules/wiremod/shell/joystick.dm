@@ -53,7 +53,7 @@
 
 	AddComponent(/datum/component/shell, list(
 		new /obj/item/circuit_component/controller()
-	), SHELL_CAPACITY_MEDIUM)
+	), SHELL_CAPACITY_MEDIUM, SHELL_FLAG_USB_PORT)
 
 	RegisterSignal(src, COMSIG_SHELL_CIRCUIT_ATTACHED, PROC_REF(on_circuit_attached))
 	RegisterSignal(src, COMSIG_SHELL_CIRCUIT_REMOVED, PROC_REF(on_circuit_removed))

@@ -164,6 +164,16 @@
 	)
 	build_path = /obj/item/implantcase/circuit
 
+/datum/design/wiremod_shell/joystick
+	name = "Joystick Shell"
+	desc = "An arcade-y joystick controller with mappable inputs."
+	id = "joystick_shell"
+	materials = list(
+		/datum/material/iron= SHEET_MATERIAL_AMOUNT * 3.5,
+		/datum/material/glass= SHEET_MATERIAL_AMOUNT * 1.5,
+	)
+	build_path = /obj/item/joystick
+
 //This design has a different path but it's still a wiremod design.
 /datum/design/board/bci_implanter
 	name = "Brain-Computer Interface Manipulation Chamber"
