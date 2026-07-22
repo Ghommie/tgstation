@@ -135,8 +135,8 @@ GLOBAL_LIST_EMPTY_TYPED(integrated_circuits, /obj/item/integrated_circuit)
  * * cell_to_set - The new cell of the circuit. Can be null.
  **/
 /obj/item/integrated_circuit/proc/set_cell(obj/item/stock_parts/power_store/cell_to_set)
-	SEND_SIGNAL(src, COMSIG_CIRCUIT_SET_CELL, cell_to_set)
 	cell = cell_to_set
+	SEND_SIGNAL(src, COMSIG_CIRCUIT_SET_CELL, cell_to_set)
 
 /**
  * Sets the locked status of the integrated circuit.
@@ -145,8 +145,8 @@ GLOBAL_LIST_EMPTY_TYPED(integrated_circuits, /obj/item/integrated_circuit)
  * * new_value - A boolean that determines if the circuit is locked or not.
  **/
 /obj/item/integrated_circuit/proc/set_locked(new_value)
-	SEND_SIGNAL(src, COMSIG_CIRCUIT_SET_LOCKED, new_value)
 	locked = new_value
+	SEND_SIGNAL(src, COMSIG_CIRCUIT_SET_LOCKED, new_value)
 
 /obj/item/integrated_circuit/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
 	if(istype(tool, /obj/item/circuit_component))
@@ -227,8 +227,8 @@ GLOBAL_LIST_EMPTY_TYPED(integrated_circuits, /obj/item/integrated_circuit)
 /obj/item/integrated_circuit/proc/set_on(new_value)
 	if(new_value == on)
 		return
-	SEND_SIGNAL(src, COMSIG_CIRCUIT_SET_ON, new_value)
 	on = new_value
+	SEND_SIGNAL(src, COMSIG_CIRCUIT_SET_ON, new_value)
 
 /**
  * Used for checking if another component of to_check's type exists in the circuit.

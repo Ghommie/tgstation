@@ -169,8 +169,9 @@
 	desc = "An arcade-y joystick controller with mappable inputs."
 	id = "joystick_shell"
 	materials = list(
-		/datum/material/iron= SHEET_MATERIAL_AMOUNT * 3.5,
-		/datum/material/glass= SHEET_MATERIAL_AMOUNT * 1.5,
+		/datum/material/plastic = SHEET_MATERIAL_AMOUNT * 3,
+		/datum/material/iron= SHEET_MATERIAL_AMOUNT * 2,
+		/datum/material/glass= SHEET_MATERIAL_AMOUNT,
 	)
 	build_path = /obj/item/joystick
 

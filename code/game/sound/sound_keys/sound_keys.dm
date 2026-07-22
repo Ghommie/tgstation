@@ -1151,3 +1151,36 @@
 		'sound/effects/magic/void_deflect2.ogg',
 		'sound/effects/magic/void_deflect3.ogg',
 	)
+
+/datum/sound_effect/joystick_shaft
+	key = SFX_JOYSTICK_SHAFT
+	file_paths = list(
+		'sound/items/joystick/joystick_shaft_1.ogg',
+		'sound/items/joystick/joystick_shaft_2.ogg',
+		'sound/items/joystick/joystick_shaft_3.ogg',
+		'sound/items/joystick/joystick_shaft_4.ogg',
+		'sound/items/joystick/joystick_shaft_5.ogg',
+		'sound/items/joystick/joystick_shaft_6.ogg',
+		'sound/items/joystick/joystick_shaft_7.ogg',
+		'sound/items/joystick/joystick_shaft_8.ogg',
+	)
+
+/datum/sound_effect/joystick_button_press
+	key = SFX_JOYSTICK_BUTTON_PRESS
+	file_paths = list(
+		'sound/items/joystick/joystick_button_press_1.ogg',
+		'sound/items/joystick/joystick_button_press_2.ogg',
+		'sound/items/joystick/joystick_button_press_3.ogg',
+		'sound/items/joystick/joystick_button_press_4.ogg',
+		'sound/items/joystick/joystick_button_press_5.ogg',
+	)
+
+/datum/sound_effect/joystick_button_release
+	key = SFX_JOYSTICK_BUTTON_RELEASE
+	file_paths = list(
+		'sound/items/joystick/joystick_button_release_1.ogg',
+		'sound/items/joystick/joystick_button_release_2.ogg',
+		'sound/items/joystick/joystick_button_release_3.ogg',
+		'sound/items/joystick/joystick_button_release_4.ogg',
+		'sound/items/joystick/joystick_button_release_5.ogg',
+	)
