@@ -958,6 +958,7 @@
 		movedelay *= overclock_coeff
 		visible_message(span_notice("[src] cools down and the humming stops."))
 	update_energy_drain()
+	SEND_SIGNAL(src, COMSIG_MECHA_TOGGLE_OVERCLOCK, overclock_mode)
 	return TRUE
 
 /// Update the energy drain according to parts and status
@@ -1020,11 +1021,19 @@
 
 ///Called when an occupant climbs in a mech that didn't previously have the MECHA_OPERATIONAL flag, or if activated via the "Engage" input for integrated circuits
 /obj/vehicle/sealed/mecha/proc/set_to_operational()
+	if(mecha_flags & MECHA_OPERATIONAL)
+		return FALSE
 	mecha_flags |= MECHA_OPERATIONAL
 	update_appearance()
+	SEND_SIGNAL(src, COMSIG_MECHA_IS_OPERATIONAL)
+	return TRUE
 
 ///Called when the last occupant exits the mech, or if [eject_everyone()] is called.
 /obj/vehicle/sealed/mecha/proc/reset_to_non_operational()
+	if(!(mecha_flags & MECHA_OPERATIONAL))
+		return FALSE
 	mecha_flags &= ~MECHA_OPERATIONAL
 	setDir(SOUTH)
 	update_appearance()
+	SEND_SIGNAL(src, COMSIG_MECHA_NOT_OPERATIONAL)
+	return TRUE

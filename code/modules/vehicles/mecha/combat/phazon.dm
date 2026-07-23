@@ -43,11 +43,6 @@
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_toggle_phasing)
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_switch_damtype)
 
-/obj/vehicle/sealed/mecha/phazon/proc/change_damage_type(new_damtype)
-	damtype = new_damtype
-	playsound(src, 'sound/vehicles/mecha/mechmove01.ogg', 50, TRUE)
-	SEND_SIGNAL(src, COMSIG_MECH_CHANGE_DAMAGE_TYPE)
-
 /obj/vehicle/sealed/mecha/phazon/CanPassThrough(atom/blocker, movement_dir, blocker_opinion)
 	if(!phasing || get_charge() <= phasing_energy_drain || throwing)
 		return ..()
@@ -84,6 +79,21 @@
 	balloon_alert(user, "not while phasing!")
 	return FALSE
 
+/obj/vehicle/sealed/mecha/phazon/proc/change_damage_type(new_damtype)
+	damtype = new_damtype
+	playsound(src, 'sound/vehicles/mecha/mechmove01.ogg', 50, TRUE)
+	SEND_SIGNAL(src, COMSIG_MECH_CHANGE_DAMAGE_TYPE)
+
+/obj/vehicle/sealed/mecha/phazon/proc/toggle_phasing(mob/user)
+	phasing = phasing
+	balloon_alert(user, "[phasing ? "enabled" : "disabled"] phasing")
+	SEND_SIGNAL(src, COMSIG_MECHA_TOGGLE_PHASING, phasing)
+
+/obj/vehicle/sealed/mecha/phazon/get_shell_circuit_components()
+	. = ..()
+	. += /obj/item/circuit_component/mecha/phase
+	. += /obj/item/circuit_component/mecha/damtype
+
 /datum/action/vehicle/sealed/mecha/mech_switch_damtype
 	name = "Reconfigure arm microtool arrays"
 	button_icon_state = "mech_damtype_brute"
@@ -112,9 +122,18 @@
 	var/obj/vehicle/sealed/mecha/phazon/phazon = chassis
 	phazon.change_damage_type(new_damtype)
 
+/datum/action/vehicle/sealed/mecha/mech_switch_damtype/proc/on_damtype_switched(datum/source)
+	SIGNAL_HANDLER
+	button_icon_state = "mech_damtype_[chassis.damtype]"
+	build_all_button_icons()
+
 /datum/action/vehicle/sealed/mecha/mech_toggle_phasing
 	name = "Toggle Phasing"
 	button_icon_state = "mech_phasing_off"
+
+/datum/action/vehicle/sealed/mecha/mech_toggle_phasing/set_chassis(passed_chassis)
+	. = ..()
+	RegisterSignal(chassis, COMSIG_MECHA_TOGGLE_PHASING, PROC_REF(on_phasing_toggled))
 
 /datum/action/vehicle/sealed/mecha/mech_toggle_phasing/Trigger(mob/clicker, trigger_flags)
 	. = ..()
@@ -123,20 +142,12 @@
 	if(!chassis || !(owner in chassis.occupants))
 		return
 	var/obj/vehicle/sealed/mecha/phazon/phazon = chassis
-	phazon.phasing = !phazon.phasing
-	button_icon_state = "mech_phasing_[phazon.phasing ? "on" : "off"]"
-	phazon.balloon_alert(owner, "[phazon.phasing ? "enabled" : "disabled"] phasing")
-	build_all_button_icons()
+	phazon.toggle_phasing(owner)
 
-/datum/action/vehicle/sealed/mecha/mech_switch_damtype/proc/on_damtype_switched(datum/source)
+/datum/action/vehicle/sealed/mecha/mech_toggle_phasing/proc/on_phasing_toggled(datum/source, phasing)
 	SIGNAL_HANDLER
-	button_icon_state = "mech_damtype_[chassis.damtype]"
+	button_icon_state = "mech_phasing_[phasing ? "on" : "off"]"
 	build_all_button_icons()
-
-/obj/vehicle/sealed/mecha/phazon/get_shell_circuit_components()
-	. = ..()
-	. += /obj/item/circuit_component/mecha/phase
-	. += /obj/item/circuit_component/mecha/damtype
 
 /obj/item/circuit_component/mecha/phase
 	display_name = "Phase"
@@ -144,13 +155,23 @@
 	required_mech_type = /obj/vehicle/sealed/mecha/phazon
 	var/datum/port/input/toggle
 	var/datum/port/output/phasing
-	var/datum/port/output/toggled
 
 /obj/item/circuit_component/mecha/phase/populate_ports()
 	. = ..()
 	toggle = add_input_port("Toggle", PORT_TYPE_SIGNAL)
 	phasing = add_output_port("Phasing", PORT_TYPE_BOOLEAN)
-	toggled = add_output_port("Toggled", PORT_TYPE_SIGNAL)
+
+/obj/item/circuit_component/mecha/phase/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECHA_TOGGLE_PHASING, PROC_REF(on_phasing_toggled))
+
+/obj/item/circuit_component/mecha/phase/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, COMSIG_MECHA_TOGGLE_PHASING)
+	return ..()
+
+/obj/item/circuit_component/mecha/phase/proc/on_phasing_toggled(datum/source, phasing_val)
+	SIGNAL_HANDLER
+	phasing.set_output(phasing_val)
 
 /obj/item/circuit_component/mecha/damtype
 	display_name = "Cycle Damage Type"
@@ -158,7 +179,6 @@
 	required_mech_type = /obj/vehicle/sealed/mecha/phazon
 	var/datum/port/input/option/damage_mode
 	var/datum/port/output/current_mode
-	var/datum/port/output/changed
 
 /obj/item/circuit_component/mecha/damtype/populate_ports()
 	. = ..()
@@ -169,14 +189,10 @@
 	)
 	damage_mode = add_option_port("Damage Mode", component_options)
 	current_mode = add_output_port("Damage Mode", PORT_TYPE_STRING)
-	changed = add_output_port("Changed", PORT_TYPE_SIGNAL)
 
 /obj/item/circuit_component/mecha/damtype/register_shell(atom/movable/shell)
 	. = ..()
-	if(isnull(mech))
-		return
-
-	RegisterSignal(mech, COMSIG_MECH_CHANGE_DAMAGE_TYPE, PROC_REF(on_damtype_switched))
+	RegisterSignal(shell, COMSIG_MECH_CHANGE_DAMAGE_TYPE, PROC_REF(on_damtype_switched))
 
 /obj/item/circuit_component/mecha/damtype/unregister_shell(atom/movable/shell)
 	UnregisterSignal(shell, COMSIG_MECH_CHANGE_DAMAGE_TYPE)
@@ -192,4 +208,3 @@
 /obj/item/circuit_component/mecha/damtype/proc/on_damtype_switched(datum/source)
 	SIGNAL_HANDLER
 	current_mode.set_output(mech.damtype)
-	changed.set_output(COMPONENT_SIGNAL)

@@ -1,3 +1,6 @@
+///cooldown between uses of the sound maker
+#define VIM_SOUND_COOLDOWN (1 SECONDS)
+
 /**
  * ## VIM!!!!!!!
  *
@@ -86,6 +89,16 @@
 	if(mecha_flags & LIGHTS_ON)
 		. += mutable_appearance(icon, "vim_headlights")
 
+/obj/vehicle/sealed/mecha/vim/proc/play_noise(sound_path, sound_message, mob/user)
+	if(COOLDOWN_FINISHED(src, sound_cooldown))
+		if(user)
+			balloon_alert(user, "on cooldown!")
+		return FALSE
+	COOLDOWN_START(src, sound_cooldown, VIM_SOUND_COOLDOWN)
+	balloon_alert_to_viewers(span_notice("[src] [sound_message]"))
+	playsound(src, sound_path, 75)
+	return TRUE
+
 /obj/vehicle/sealed/mecha/vim/get_shell_circuit_components()
 	. = ..()
 	. += /obj/item/circuit_component/mecha/vim
@@ -101,3 +114,39 @@
 	. = ..()
 	chime = add_input_port("Chime", PORT_TYPE_SIGNAL)
 	buzz = add_input_port("Buzz", PORT_TYPE_SIGNAL)
+
+/obj/item/circuit_component/mecha/vim/input_received(datum/port/input/port, list/return_values)
+	var/obj/vehicle/sealed/mecha/vim/vim = mech
+	if(COMPONENT_TRIGGERED_BY(chime, port))
+		vim.play_noise(/datum/action/vehicle/sealed/noise/chime::sound_path, /datum/action/vehicle/sealed/noise/chime::sound_message)
+	else if(COMPONENT_TRIGGERED_BY(buzz, port))
+		vim.play_noise(/datum/action/vehicle/sealed/noise/buzz::sound_path, /datum/action/vehicle/sealed/noise/buzz::sound_message)
+
+//VIM ACTION DATUMS
+
+/datum/action/vehicle/sealed/noise
+	var/sound_path = 'sound/items/carhorn.ogg'
+	var/sound_message = "makes a sound."
+
+/datum/action/vehicle/sealed/noise/Trigger(mob/clicker, trigger_flags)
+	. = ..()
+	if(!.)
+		return FALSE
+	var/obj/vehicle/sealed/mecha/vim/vim_mecha = vehicle_entered_target
+	return vim_mecha.play_noise(sound_path, sound_message, owner)
+
+/datum/action/vehicle/sealed/noise/chime
+	name = "Chime!"
+	desc = "Affirmative!"
+	button_icon_state = "vim_chime"
+	sound_path = 'sound/machines/chime.ogg'
+	sound_message = "chimes!"
+
+/datum/action/vehicle/sealed/noise/buzz
+	name = "Buzz."
+	desc = "Negative!"
+	button_icon_state = "vim_buzz"
+	sound_path = 'sound/machines/buzz/buzz-sigh.ogg'
+	sound_message = "buzzes."
+
+#undef VIM_SOUND_COOLDOWN

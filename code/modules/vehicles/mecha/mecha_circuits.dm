@@ -10,15 +10,15 @@
 	if(istype(shell, required_mech_type))
 		mech = shell
 
+/obj/item/circuit_component/mecha/unregister_shell(atom/movable/shell)
+	mech = null
+	return ..()
+
 /obj/item/circuit_component/mecha/should_receive_input(datum/port/input/port)
 	if(isnull(mech))
 		return FALSE
 	if(requires_mech_on && !(mech.mecha_flags & MECHA_OPERATIONAL))
 		return FALSE
-	return ..()
-
-/obj/item/circuit_component/mecha/unregister_shell(atom/movable/shell)
-	mech = null
 	return ..()
 
 /obj/item/circuit_component/mecha/main
@@ -43,6 +43,31 @@
 
 	booted = add_output_port("Booted", PORT_TYPE_SIGNAL)
 	has_shutdown = add_output_port("Has Shut Down", PORT_TYPE_SIGNAL)
+
+/obj/item/circuit_component/mecha/main/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECHA_IS_OPERATIONAL, PROC_REF(on_operational))
+	RegisterSignal(shell, COMSIG_MECHA_NOT_OPERATIONAL, PROC_REF(on_not_operational))
+
+/obj/item/circuit_component/mecha/main/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, list(COMSIG_MECHA_IS_OPERATIONAL, COMSIG_MECHA_NOT_OPERATIONAL))
+	return ..()
+
+/obj/item/circuit_component/mecha/main/input_received(datum/port/input/port, list/return_values)
+	if(COMPONENT_TRIGGERED_BY(boot, port))
+		if(mech.set_to_operational())
+			playsound(src, mech.stepsound, 30, TRUE)
+		return
+	if(COMPONENT_TRIGGERED_BY(shutdown, port))
+		mech.eject_everyone()
+
+/obj/item/circuit_component/mecha/main/proc/on_operational(datum/source)
+	SIGNAL_HANDLER
+	booted.set_output(COMPONENT_SIGNAL)
+
+/obj/item/circuit_component/mecha/main/proc/on_not_operational(datum/source)
+	SIGNAL_HANDLER
+	has_shutdown.set_output(COMPONENT_SIGNAL)
 
 /obj/item/circuit_component/mecha/actions
 	display_name = "Toggles"
@@ -115,43 +140,74 @@
 	desc = "Used to control movement of an exosuit in the four cardinal directions."
 	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL
 
-	var/datum/port/input/direction
+	var/datum/port/input/move
 
 	var/datum/port/output/moved
-	var/datum/port/output/movement_dir
 
-	var/datum/port/output/dir_changed
-	var/datum/port/output/current_dir
-
-	var/planned_direction = NONE
+	var/datum/port/output/mecha_dir
 
 /obj/item/circuit_component/mecha/movement/populate_ports()
 	. = ..()
-	direction = add_input_port("Direction", PORT_TYPE_DIRECTION)
+	move = add_direction_input_port("Move", NORTH|EAST|SOUTH|WEST, list(NORTH|SOUTH, WEST|EAST))
 
-	moved = add_output_port("Moved", PORT_TYPE_SIGNAL)
-	movement_dir = add_output_port("Movement Direction", PORT_TYPE_STRING)
+	moved = add_direction_output_port("Moved")
 
-	dir_changed = add_output_port("Direction Changed", PORT_TYPE_SIGNAL)
-	current_dir = add_output_port("Current Direction", PORT_TYPE_STRING)
+	mecha_dir = add_direction_output_port("Faced Direction")
+
+/obj/item/circuit_component/mecha/movement/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECHA_VEHICULAR_MOVE, PROC_REF(on_vehicle_moved))
+	RegisterSignal(shell, COMSIG_ATOM_POST_DIR_CHANGE, PROC_REF(on_dir_changed))
+
+/obj/item/circuit_component/mecha/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, list(COMSIG_MECHA_VEHICULAR_MOVE, COMSIG_ATOM_POST_DIR_CHANGE))
+	return ..()
+
+/obj/item/circuit_component/mecha/movement/proc/on_vehicle_moved(datum/source, direction)
+	SIGNAL_HANDLER
+	moved.set_output(direction)
+
+/obj/item/circuit_component/mecha/movement/proc/on_dir_changed(datum/source, old_dir, new_dir)
+	SIGNAL_HANDLER
+	mecha_dir.set_output(new_dir)
 
 /obj/item/circuit_component/mecha/movement/input_received(datum/port/input/port, list/return_values)
-	var/chosen_dir = direction.value
-	if(!chosen_dir)
+	var/direction = move.value
+	if(!direction)
 		return
-	mech.vehicle_move(chosen_dir)
+	mech.vehicle_move(direction)
 
 /obj/item/circuit_component/mecha/punch
-	display_name = "Punch"
-	desc = "For when you just want to punch things with your exosuit."
-	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL|CIRCUIT_FLAG_OUTPUT_SIGNAL
+	display_name = "Melee Attack"
+	desc = "For when you just want to give someone or something a big stompy knuckle sandwhich."
+	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL
 
 	///The punched atom.
-	var/datum/port/output/punched_atom
+	var/datum/port/output/attacked
+	var/datum/port/output/attacker
 
 /obj/item/circuit_component/mecha/punch/populate_ports()
 	. = ..()
-	punched_atom = add_output_port("Punched Entity", PORT_TYPE_ATOM)
+	attacked = add_output_port("Attacked Entity", PORT_TYPE_ATOM)
+	attacker = add_output_port("Attacker", PORT_TYPE_USER)
+
+/obj/item/circuit_component/mecha/punch/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECH_MELEE_ATTACK, PROC_REF(on_mecha_attacking))
+
+/obj/item/circuit_component/mecha/punch/input_received(datum/port/input/port, list/return_values)
+	var/atom/target //TODO code for choosing a valid target
+	mech.interact_with_atom(target, only_melee = TRUE)
+
+/obj/item/circuit_component/mecha/punch/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, COMSIG_MECH_MELEE_ATTACK)
+	return ..()
+
+/obj/item/circuit_component/mecha/punch/proc/on_mecha_attacking(datum/source, atom/target, mob/user)
+	SIGNAL_HANDLER
+	attacked.set_output(target)
+	if(user)
+		attacker.set_output(user)
 
 /obj/item/circuit_component/mecha/overclock
 	display_name = "Overclock"
@@ -163,3 +219,18 @@
 /obj/item/circuit_component/mecha/overclock/populate_ports()
 	. = ..()
 	overclocked = add_output_port("Overclocked", PORT_TYPE_BOOLEAN)
+
+/obj/item/circuit_component/mecha/overclock/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECHA_TOGGLE_OVERCLOCK, PROC_REF(on_overclock_toggled))
+
+/obj/item/circuit_component/mecha/overclock/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, COMSIG_MECHA_TOGGLE_OVERCLOCK)
+	return ..()
+
+/obj/item/circuit_component/mecha/overclock/input_received(datum/port/input/port, list/return_values)
+	mech.toggle_overclock()
+
+/obj/item/circuit_component/mecha/overclock/proc/on_overclock_toggled(datum/source, new_overclock)
+	SIGNAL_HANDLER
+	overclocked.set_output(new_overclock)

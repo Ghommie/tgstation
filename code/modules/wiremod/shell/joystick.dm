@@ -343,6 +343,11 @@
 	UnregisterSignal(shell, list(COMSIG_JOYSTICK_BUTTON_PRESSED, COMSIG_JOYSTICK_BUTTON_RELEASED, COMSIG_ITEM_ATTACK_SELF_SECONDARY))
 	STOP_PROCESSING(SScircuit_component, src)
 
+/obj/item/circuit_component/joystick/should_receive_input(datum/port/input/port)
+	if(isnull(joystick))
+		return FALSE
+	return ..()
+
 /obj/item/circuit_component/joystick/get_ui_notices()
 	. = ..()
 	. += create_ui_notice("Button outputs are set to 1 on press and 0 on release.", "info", "gamepad")

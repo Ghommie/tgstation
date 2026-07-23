@@ -5,13 +5,13 @@
  * return value is number of damage dealt. returning a value puts our mech onto attack cooldown.
  * Arguments:
  * * mecha_attacker: Mech attacking this target
- * * user: mob that initiated the attack from inside the mech as a controller
+ * * user: mob that initiated the attack from inside the mech as a controller. It can be null if the mech is controlled by something else.
  */
 /atom/proc/mech_melee_attack(obj/vehicle/sealed/mecha/mecha_attacker, mob/living/user)
 	SHOULD_CALL_PARENT(TRUE)
 	SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_MECH, mecha_attacker, user)
-	if(!isnull(user))
-		log_combat(user, src, "attacked", mecha_attacker, "(COMBAT MODE: [uppertext(user?.combat_mode)] (DAMTYPE: [uppertext(mecha_attacker.damtype)])")
+	SEND_SIGNAL(mecha_attacker, COMSIG_MECH_MELEE_ATTACK, src, user)
+	log_combat(user || mecha_attacker, src, "attacked", mecha_attacker, "(COMBAT MODE: [uppertext(user?.combat_mode) || "NO USER"] (DAMTYPE: [uppertext(mecha_attacker.damtype)])")
 	return
 
 /turf/closed/wall/mech_melee_attack(obj/vehicle/sealed/mecha/mecha_attacker, mob/living/user)
