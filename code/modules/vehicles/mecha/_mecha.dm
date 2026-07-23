@@ -797,7 +797,7 @@
 /obj/vehicle/sealed/mecha/proc/can_interact_with(atom/target, mob/user, list/modifiers)
 	if(completely_disabled || is_currently_ejecting || (mecha_flags & CANNOT_INTERACT))
 		return FALSE
-	if(user.incapacitated)
+	if(user?.incapacitated)
 		return FALSE
 	if(!get_charge())
 		return FALSE
