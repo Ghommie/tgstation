@@ -130,10 +130,58 @@
 	use_right_equipment = add_input_port("Use Right", PORT_TYPE_SIGNAL)
 	use_left_equipment = add_input_port("Use Left", PORT_TYPE_SIGNAL)
 
-	target = add_input_port("Target", PORT_TYPE_ATOM)
+	target = add_input_port("Target", PORT_TYPE_ATOM, trigger = null)
 
 	right_equipment_used = add_output_port("Right Used", PORT_TYPE_SIGNAL)
 	left_equipment_used = add_output_port("Left Used", PORT_TYPE_ATOM)
+
+/obj/item/circuit_component/mecha/equipment/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECHA_RECEIVED_EQUIPMENT, PROC_REF(register_equipment))
+	if(mech)
+		for(var/key, item in mech.equip_by_category)
+			if(!item)
+				continue
+			register_equipment(mech, item)
+
+/obj/item/circuit_component/mecha/equipment/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, COMSIG_MECHA_RECEIVED_EQUIPMENT)
+	if(mech)
+		for(var/key, item in mech.equip_by_category)
+			if(!item)
+				continue
+			unregister_equipment(item)
+	return ..()
+
+/obj/item/circuit_component/mecha/equipment/input_received(datum/port/input/port, list/return_values)
+	var/atom/chosen_target
+	//TODO target-picking code
+	if(isnull(chosen_target))
+		return
+
+	var/list/modifiers = list()
+	if(COMPONENT_TRIGGERED_BY(use_right_equipment, port))
+		modifiers[BUTTON] = RIGHT_CLICK
+	else
+		modifiers[BUTTON] = LEFT_CLICK
+
+	mech.interact_with_atom(chosen_target, modifiers = modifiers)
+
+/obj/item/circuit_component/mecha/equipment/proc/register_equipment(datum/source, obj/item/mecha_parts/mecha_equipment/equipment)
+	SIGNAL_HANDLER
+	RegisterSignal(equipment, COMSIG_MOB_USED_MECH_EQUIPMENT, PROC_REF(on_mech_equipment_used))
+	RegisterSignal(equipment, COMSIG_MECHA_EQUIPMENT_DETACHED, PROC_REF(unregister_equipment))
+
+/obj/item/circuit_component/mecha/equipment/proc/on_mech_equipment_used(obj/item/mecha_parts/mecha_equipment/equipment, obj/vehicle/sealed/mecha/chassis)
+	SIGNAL_HANDLER
+	if(equipment == mech.equip_by_category[MECHA_R_ARM])
+		right_equipment_used.set_output(COMPONENT_SIGNAL)
+	else if(equipment == mech.equip_by_category[MECHA_L_ARM])
+		left_equipment_used.set_output(COMPONENT_SIGNAL)
+
+/obj/item/circuit_component/mecha/equipment/proc/unregister_equipment(obj/item/mecha_parts/mecha_equipment/equipment)
+	SIGNAL_HANDLER
+	UnregisterSignal(equipment, list(COMSIG_MOB_USED_MECH_EQUIPMENT, COMSIG_MECHA_EQUIPMENT_DETACHED))
 
 /obj/item/circuit_component/mecha/movement
 	display_name = "Movement"
@@ -212,7 +260,7 @@
 /obj/item/circuit_component/mecha/overclock
 	display_name = "Overclock"
 	desc = "Toggles overclock on and off."
-	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL|CIRCUIT_FLAG_OUTPUT_SIGNAL
+	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL
 
 	var/datum/port/output/overclocked
 

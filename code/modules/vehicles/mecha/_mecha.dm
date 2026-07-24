@@ -195,8 +195,14 @@
 	/// Module selected by default when mech UI is opened
 	var/ui_selected_module_index
 
-	///The capacity of the shell component (integrated circuits) if one is ever added
+	///The capacity of the shell component (integrated circuits) of this mech
 	var/shell_capacity = SHELL_CAPACITY_VERY_LARGE
+
+	/**
+	 * Added/removed to/from the mecha by [/obj/item/mecha_parts/mecha_equipment/do_after_cooldown()] and [/obj/item/mecha_parts/mecha_equipment/do_after_mecha()],
+	 * needed when performing timed actions without a user. As interaction keys are natively (as in inside the do_after() proc) supported only for mobs.
+	 */
+	var/list/interaction_keys_self
 
 	/// Whether we've been knocked down, unable to move
 	var/toppled = FALSE

@@ -140,20 +140,30 @@
 /obj/item/mecha_parts/mecha_equipment/proc/do_after_cooldown(atom/target, mob/user, interaction_key, flags)
 	if(!chassis)
 		return FALSE
+	if(!interaction_key)
+		interaction_key = target
+	if(chassis.interaction_keys_self?[interaction_key])
+		return FALSE
+	LAZYSET(chassis.interaction_keys_self, interaction_key, TRUE)
 	chassis.use_energy(energy_drain)
-	return do_after(user, get_equip_cooldown(target), target, extra_checks = CALLBACK(src, PROC_REF(do_after_checks), target, flags), interaction_key = interaction_key)
+	. = do_after(user || chassis, get_equip_cooldown(target), target, extra_checks = CALLBACK(src, PROC_REF(do_after_checks), target, flags), interaction_key = interaction_key)
+	LAZYREMOVE(chassis.interaction_keys_self, interaction_key)
 
 ///Do after wrapper for mecha equipment
 /obj/item/mecha_parts/mecha_equipment/proc/do_after_mecha(atom/target, mob/user, delay, flags)
-	if(!user) //TODO delays without user
+	if(!chassis)
 		return FALSE
-	return do_after(user, delay, target, extra_checks = CALLBACK(src, PROC_REF(do_after_checks), target, flags))
+	if(chassis.interaction_keys_self?[target])
+		return FALSE
+	LAZYSET(chassis.interaction_keys_self, target, TRUE)
+	. = do_after(user || chassis, delay, target, extra_checks = CALLBACK(src, PROC_REF(do_after_checks), target, flags))
+	LAZYREMOVE(chassis.interaction_keys_self, target)
 
 /// do after checks for the mecha equipment do afters
 /obj/item/mecha_parts/mecha_equipment/proc/do_after_checks(atom/target, flags = MECH_DO_AFTER_DIR_CHANGE_FLAG)
 	. = TRUE
 
-	if(!chassis)
+	if(!chassis || !(chassis.mecha_flags & MECHA_OPERATIONAL))
 		return FALSE
 
 	if(flags & MECH_DO_AFTER_DIR_CHANGE_FLAG && !(get_dir(chassis, target) & chassis.dir))
@@ -220,6 +230,7 @@
 		new_mecha.equip_by_category[to_equip_slot] = src
 	chassis = new_mecha
 	SEND_SIGNAL(src, COMSIG_MECHA_EQUIPMENT_ATTACHED)
+	SEND_SIGNAL(new_mecha, COMSIG_MECHA_RECEIVED_EQUIPMENT, src)
 	forceMove(new_mecha)
 	log_message("[src] initialized.", LOG_MECHA)
 	chassis.on_equipment_attach(src)

@@ -13,6 +13,7 @@
 
 /// sent if you attach equipment to mecha
 #define COMSIG_MECHA_EQUIPMENT_ATTACHED "mecha_equipment_attached"
+#define COMSIG_MECHA_RECEIVED_EQUIPMENT "mecha_received_equipment"
 /// sent if you detach equipment to mecha
 #define COMSIG_MECHA_EQUIPMENT_DETACHED "mecha_equipment_detached"
 /// sent when you are able to drill through a mob
