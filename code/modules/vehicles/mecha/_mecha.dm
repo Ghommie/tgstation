@@ -827,6 +827,20 @@
 
 	toggle_strafe()
 
+/obj/vehicle/sealed/mecha/proc/toggle_strafe()
+	if(!(mecha_flags & CAN_STRAFE))
+		to_chat(occupants, "this mecha doesn't support strafing!")
+		return
+
+	strafe = !strafe
+	set_dir_on_move = !strafe
+
+	for(var/mob/occupant in occupants)
+		balloon_alert(occupant, "strafing [strafe?"on":"off"]")
+		occupant.playsound_local(src, 'sound/machines/terminal/terminal_eject.ogg', 50, TRUE)
+	log_message("Toggled strafing mode [strafe?"on":"off"].", LOG_MECHA)
+
+	SEND_SIGNAL(src, COMSIG_MECH_STRAFE_TOGGLE, strafe)
 
 /// Middle mouse click signal wrapper for AI users
 /obj/vehicle/sealed/mecha/proc/on_middlemouseclick(mob/user, atom/target, params)
@@ -952,10 +966,6 @@
 		overclock_mode = !overclock_mode
 
 	log_message("Toggled [overclock_name].", LOG_MECHA)
-	for(var/mob/occupant as anything in occupants)
-		balloon_alert(occupant, "[overclock_name] [overclock_mode ? "on":"off"]")
-		var/datum/action/act = locate(/datum/action/vehicle/sealed/mecha/mech_overclock) in occupant.actions
-		act?.build_all_button_icons(UPDATE_BUTTON_ICON)
 
 	if(overclock_mode)
 		movedelay /= overclock_coeff
@@ -998,14 +1008,8 @@
 	set_light_on(mecha_flags & LIGHTS_ON)
 	playsound(src,'sound/machines/clockcult/brass_skewer.ogg', 40, TRUE)
 	log_message("Toggled lights [(mecha_flags & LIGHTS_ON)?"on":"off"].", LOG_MECHA)
-	for(var/mob/occupant as anything in occupants)
-		var/datum/action/act = locate(/datum/action/vehicle/sealed/mecha/mech_toggle_lights) in occupant.actions
-		if(mecha_flags & LIGHTS_ON)
-			act.button_icon_state = "mech_lights_on"
-		else
-			act.button_icon_state = "mech_lights_off"
-		balloon_alert(occupant, "lights [mecha_flags & LIGHTS_ON ? "on":"off"]")
-		act.build_all_button_icons()
+
+	SEND_SIGNAL(src, COMSIG_MECH_LIGHTS_TOGGLE, mecha_flags & LIGHTS_ON)
 
 /obj/vehicle/sealed/mecha/proc/melee_attack_effect(mob/living/victim, heavy)
 	if(heavy)

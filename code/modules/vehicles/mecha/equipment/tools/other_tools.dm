@@ -15,7 +15,7 @@
 	var/teleport_range = 7
 
 /obj/item/mecha_parts/mecha_equipment/teleporter/action(mob/source, atom/target, list/modifiers)
-	if(!action_checks(target) || !check_teleport_valid(source, target, TELEPORT_CHANNEL_BLUESPACE))
+	if(!action_checks(target) || !check_teleport_valid(chassis, target, TELEPORT_CHANNEL_BLUESPACE))
 		return
 	var/turf/T = get_turf(target)
 	if(T && (loc.z == T.z) && (get_dist(loc, T) <= teleport_range))
@@ -37,7 +37,7 @@
 
 
 /obj/item/mecha_parts/mecha_equipment/wormhole_generator/action(mob/source, atom/target, list/modifiers)
-	if(!action_checks(target) || !check_teleport_valid(source, target, TELEPORT_CHANNEL_WORMHOLE))
+	if(!action_checks(target) || !check_teleport_valid(chassis, target, TELEPORT_CHANNEL_WORMHOLE))
 		return
 	var/area/targetarea = pick(get_areas_in_range(100, chassis))
 	if(!targetarea)//Literally middle of nowhere how did you even get here
@@ -58,7 +58,8 @@
 		return
 	var/list/obj/effect/portal/created = create_portal_pair(ourturf, target_turf, 300, 1, /obj/effect/portal/anom)
 	message_admins("[ADMIN_LOOKUPFLW(source)] used a Wormhole Generator in [ADMIN_VERBOSEJMP(ourturf)]")
-	source.log_message("used a Wormhole Generator in [AREACOORD(ourturf)].", LOG_GAME)
+	var/atom/log_source = source || chassis
+	log_source.log_message("used a Wormhole Generator in [AREACOORD(ourturf)].", LOG_GAME)
 	QDEL_LIST_IN(created, rand(150,300))
 	return ..()
 
@@ -85,6 +86,7 @@
 /obj/item/mecha_parts/mecha_equipment/gravcatapult/action(mob/source, atom/movable/target, list/modifiers)
 	if(!action_checks(target))
 		return
+	var/atom/log_source = source || chassis
 	switch(mode)
 		if(GRAVSLING_MODE)
 			if(!movable_target)
@@ -104,7 +106,7 @@
 					var/turf/orig = get_turf(movable_target)
 					movable_target.throw_at(target, 14, 1.5)
 					movable_target = null
-					source.log_message("used a Gravitational Catapult to throw [movable_target] (From [AREACOORD(orig)]) at [target] ([AREACOORD(targ)]).", LOG_GAME)
+					log_source.log_message("used a Gravitational Catapult to throw [movable_target] (From [AREACOORD(orig)]) at [target] ([AREACOORD(targ)]).", LOG_MECHA)
 					return ..()
 				movable_target = null
 				to_chat(source, "[icon2html(src, source)][span_notice("Lock on [movable_target] disengaged.")]")
@@ -124,7 +126,7 @@
 						continue
 				do_scatter(scatter, target)
 			var/turf/targetturf = get_turf(target)
-			source.log_message("used a Gravitational Catapult repulse wave on [AREACOORD(targetturf)].", LOG_GAME)
+			log_source.log_message("used a Gravitational Catapult repulse wave on [AREACOORD(targetturf)].", LOG_MECHA)
 			return ..()
 
 /obj/item/mecha_parts/mecha_equipment/gravcatapult/proc/do_scatter(atom/movable/scatter, atom/movable/target)

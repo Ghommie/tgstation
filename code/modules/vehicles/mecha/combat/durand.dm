@@ -51,29 +51,15 @@
 	. = ..()
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_defense_mode)
 
-/obj/item/circuit_component/mecha/defense_mode
-	display_name = "Toggle Defense Mode"
-	desc = "Enable of disable an emergency shield that blocks all attacks from the faced direction."
-	required_mech_type = /obj/vehicle/sealed/mecha/durand
-	var/datum/port/input/toggle
-	var/datum/port/output/defense
-	var/datum/port/output/toggled
-
-/obj/item/circuit_component/mecha/defense_mode/populate_ports()
-	. = ..()
-	toggle = add_input_port("Toggle", PORT_TYPE_SIGNAL)
-	defense = add_output_port("Defense Mode", PORT_TYPE_STRING)
-	toggled = add_output_port("Toggled", PORT_TYPE_SIGNAL)
-
 /obj/vehicle/sealed/mecha/durand/process()
 	. = ..()
 	// Defence mode can only be on with a occupant so we check if one of them can toggle it and toggle
 	if(defense_mode && !use_energy(0.01 * STANDARD_CELL_CHARGE))
-		toggle_defense()
+		toggle_defense(force_switch = TRUE)
 
 /obj/vehicle/sealed/mecha/durand/mob_exit(mob/M, silent = FALSE, randomstep = FALSE, forced = FALSE)
 	if(defense_mode)
-		toggle_defense()
+		toggle_defense(force_switch = TRUE)
 	return ..()
 
 //Redirects projectiles to the shield if defense_check decides they should be blocked and returns true.
@@ -100,11 +86,11 @@
 		if (WEST)
 			return abs(y - aloc.y) <= (x - aloc.x) * 2
 
-/obj/vehicle/sealed/mecha/durand/proc/toggle_defense(mob/living/user)
+/obj/vehicle/sealed/mecha/durand/proc/toggle_defense(mob/living/user, force_switch)
 	if(!LAZYLEN(occupants))
 		return
 
-	if(switching && (user || !defense_mode)) // Allow force shutdowns during animation
+	if(switching && !force_switch) // Allow force shutdowns during animation
 		return
 
 	if(!defense_mode && cell?.charge < 100) // If it's off, and we have less than 100 units of power
@@ -121,11 +107,6 @@
 	else
 		log_message("defense mode state changed -- now [defense_mode ? "enabled" : "disabled"].", LOG_MECHA)
 
-	for(var/mob/living/occupant as anything in occupants)
-		var/datum/action/button = occupant_actions[occupant][/datum/action/vehicle/sealed/mecha/mech_defense_mode]
-		button.button_icon_state = "mech_defense_mode_[defense_mode ? "on" : "off"]"
-		button.build_all_button_icons()
-
 	shield.set_light_on(defense_mode)
 
 	if(defense_mode)
@@ -138,6 +119,11 @@
 		playsound(src, 'sound/vehicles/mecha/mech_shield_drop.ogg', 50, FALSE)
 
 	addtimer(VARSET_CALLBACK(src, switching, FALSE), 0.7 SECONDS) // Shield animation length
+	SEND_SIGNAL(src, COMSIG_MECHA_TOGGLE_DEFENSE, defense_mode)
+
+/obj/vehicle/sealed/mecha/durand/get_shell_circuit_components()
+	. = ..()
+	. += /obj/item/circuit_component/mecha/vim
 
 /obj/vehicle/sealed/mecha/durand/attack_generic(mob/user, damage_amount = 0, damage_type = BRUTE, damage_flag = 0, sound_effect = 1, armor_penetration = 0)
 	if(defense_check(get_turf(user)))
@@ -169,6 +155,10 @@
 	desc = "Toggle an energy shield that blocks all attacks from the faced direction at a heavy power cost."
 	button_icon_state = "mech_defense_mode_off"
 
+/datum/action/vehicle/sealed/mecha/mech_defense_mode/set_chassis(passed_chassis)
+	. = ..()
+	RegisterSignal(chassis, COMSIG_MECHA_TOGGLE_DEFENSE, PROC_REF(update_action_icon))
+
 /datum/action/vehicle/sealed/mecha/mech_defense_mode/Trigger(mob/clicker, trigger_flags, forced_state = FALSE)
 	. = ..()
 	if(!.)
@@ -176,6 +166,12 @@
 	if(chassis && (owner in chassis.occupants))
 		var/obj/vehicle/sealed/mecha/durand/durand = chassis
 		durand.toggle_defense(owner)
+
+
+/datum/action/vehicle/sealed/mecha/mech_defense_mode/proc/update_action_icon(datum/source, defense_mode)
+	SIGNAL_HANDLER
+	button_icon_state = "mech_defense_mode_[defense_mode ? "on" : "off"]"
+	build_all_button_icons()
 
 // Shield processing
 
@@ -227,7 +223,7 @@
 		return
 	if(!chassis.use_energy(. * (STANDARD_CELL_CHARGE / 150)))
 		chassis.cell?.charge = 0
-		chassis.toggle_defense()
+		chassis.toggle_defense(force_switch = TRUE)
 	atom_integrity = 10000
 
 /obj/durand_shield/play_attack_sound()
@@ -236,3 +232,31 @@
 /obj/durand_shield/bullet_act()
 	play_attack_sound()
 	. = ..()
+
+
+/obj/item/circuit_component/mecha/defense_mode
+	display_name = "Toggle Defense Mode"
+	desc = "Enable of disable an emergency shield that blocks all attacks from the faced direction."
+	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL
+	required_mech_type = /obj/vehicle/sealed/mecha/durand
+	var/datum/port/output/defense
+
+/obj/item/circuit_component/mecha/defense_mode/populate_ports()
+	. = ..()
+	defense = add_output_port("Defense Mode", PORT_TYPE_BOOLEAN)
+
+/obj/item/circuit_component/mecha/defense_mode/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECHA_TOGGLE_DEFENSE, PROC_REF(defense_toggled))
+
+/obj/item/circuit_component/mecha/defense_mode/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, COMSIG_MECHA_TOGGLE_DEFENSE)
+	return ..()
+
+/obj/item/circuit_component/mecha/defense_mode/input_received(datum/port/input/port, list/return_values)
+	var/obj/vehicle/sealed/mecha/durand/durand = mech
+	durand.toggle_defense()
+
+/obj/item/circuit_component/mecha/defense_mode/proc/defense_toggled(datum/source, defense_mode)
+	SIGNAL_HANDLER
+	defense.set_output(defense_mode)

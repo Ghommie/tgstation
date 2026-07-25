@@ -461,12 +461,12 @@
 		return REVERSE_DIR(dir) & unres_sides
 	return ..()
 
-/obj/machinery/door/window/try_to_crowbar(obj/item/I, mob/user, forced = FALSE)
-	if(istype(I, /obj/item/crowbar/power))
-		var/obj/item/crowbar/power/power_tool = I
+/obj/machinery/door/window/try_to_crowbar(obj/item/crowbar, mob/user, forced = FALSE)
+	if(istype(crowbar, /obj/item/crowbar/power))
+		var/obj/item/crowbar/power/power_tool = crowbar
 		if(power_tool.limit_jaws_access && forced)
 			playsound(src.loc, 'sound/machines/buzz/buzz-sigh.ogg', 50, FALSE)
-			user.balloon_alert(user, "cannot pry open!")
+			user?.balloon_alert(user, "cannot pry open!")
 			return
 
 	if(!hasPower() || forced)

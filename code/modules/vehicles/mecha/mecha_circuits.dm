@@ -77,36 +77,58 @@
 	var/datum/port/input/toggle_safeties
 	///If safeties are on or off
 	var/datum/port/output/safeties
-	///Sent when safeties are (dis)engaged
-	var/datum/port/output/safeties_toggled
 
 	///Toggle strafing
 	var/datum/port/input/toggle_strafing
 	///If straging is enabled or disabled
 	var/datum/port/output/strafing
-	///Sent when strafing is toggled
-	var/datum/port/output/stafing_toggled
 
 	///Toggle lights
 	var/datum/port/input/toggle_lights
 	///If lights are on or off
 	var/datum/port/output/lights
-	///Sent when the lights are turned on/off
-	var/datum/port/output/lights_toggled
 
 /obj/item/circuit_component/mecha/actions/populate_ports()
 	. = ..()
-	toggle_safeties = add_input_port("Toggle Safeties", PORT_TYPE_SIGNAL)
+	toggle_safeties = add_input_port("Toggle Safeties", PORT_TYPE_SIGNAL, trigger = PROC_REF(toggle_safeties))
 	safeties = add_output_port("Safeties", PORT_TYPE_BOOLEAN)
-	safeties_toggled = add_output_port("Safeties Toggled", PORT_TYPE_SIGNAL)
 	if(mech.mecha_flags & CAN_STRAFE)
-		toggle_strafing = add_input_port("Toggle Strafing", PORT_TYPE_SIGNAL)
+		toggle_strafing = add_input_port("Toggle Strafing", PORT_TYPE_SIGNAL, trigger = PROC_REF(toggle_strafing))
 		strafing = add_output_port("Strafing", PORT_TYPE_BOOLEAN)
-		stafing_toggled = add_output_port("Strafing Toggled", PORT_TYPE_SIGNAL)
 	if(mech.mecha_flags & HAS_LIGHTS)
-		toggle_lights = add_input_port("Toggle Lights", PORT_TYPE_SIGNAL)
+		toggle_lights = add_input_port("Toggle Lights", PORT_TYPE_SIGNAL, trigger = PROC_REF(toggle_lights))
 		lights = add_output_port("Lights", PORT_TYPE_BOOLEAN)
-		lights_toggled = add_output_port("Lights Toggled", PORT_TYPE_SIGNAL)
+
+/obj/item/circuit_component/mecha/actions/register_shell(atom/movable/shell)
+	. = ..()
+	RegisterSignal(shell, COMSIG_MECH_SAFETIES_TOGGLE, PROC_REF(safeties_toggled))
+	RegisterSignal(shell, COMSIG_MECH_STRAFE_TOGGLE, PROC_REF(strafing_toggled))
+	RegisterSignal(shell, COMSIG_MECH_LIGHTS_TOGGLE, PROC_REF(lights_toggled))
+
+/obj/item/circuit_component/mecha/actions/unregister_shell(atom/movable/shell)
+	UnregisterSignal(shell, list(COMSIG_MECH_SAFETIES_TOGGLE, COMSIG_MECH_STRAFE_TOGGLE, COMSIG_MECH_LIGHTS_TOGGLE))
+	return ..()
+
+/obj/item/circuit_component/mecha/actions/proc/toggle_safeties(datum/port/input/port, list/return_values)
+	mech.set_safety()
+
+/obj/item/circuit_component/mecha/actions/proc/safeties_toggled(datum/source, mob/user, weapon_safety)
+	SIGNAL_HANDLER
+	safeties.set_output(weapon_safety)
+
+/obj/item/circuit_component/mecha/actions/proc/toggle_strafing(datum/port/input/port, list/return_values)
+	mech.toggle_strafe()
+
+/obj/item/circuit_component/mecha/actions/proc/strafing_toggled(datum/source, strafe)
+	SIGNAL_HANDLER
+	strafing.set_output(strafe)
+
+/obj/item/circuit_component/mecha/actions/proc/toggle_lights(datum/port/input/port, list/return_values)
+	mech.toggle_lights()
+
+/obj/item/circuit_component/mecha/actions/proc/lights_toggled(datum/source, lights_on)
+	SIGNAL_HANDLER
+	lights.set_output(lights_on)
 
 /obj/item/circuit_component/mecha/equipment
 	display_name = "Equipment"

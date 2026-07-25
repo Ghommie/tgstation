@@ -124,7 +124,8 @@
 
 /obj/item/mecha_parts/mecha_equipment/proc/action(mob/source, atom/target, list/modifiers)
 	TIMER_COOLDOWN_START(chassis, COOLDOWN_MECHA_EQUIPMENT(type), get_equip_cooldown(target))//Cooldown is on the MECH so people dont bypass it by switching equipment
-	SEND_SIGNAL(source, COMSIG_MOB_USED_MECH_EQUIPMENT, chassis)
+	if(source)
+		SEND_SIGNAL(source, COMSIG_MOB_USED_MECH_EQUIPMENT, chassis)
 	chassis.use_energy(energy_drain)
 	return TRUE
 

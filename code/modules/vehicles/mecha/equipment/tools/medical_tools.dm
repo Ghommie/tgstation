@@ -52,7 +52,7 @@
 		return
 	to_chat(source, "[icon2html(src, source)][span_notice("You start putting [target] into [src]...")]")
 	chassis.visible_message(span_warning("[chassis] starts putting [target] into \the [src]."))
-	if(!do_after(source, get_equip_cooldown(atomtarget), target, extra_checks=CALLBACK(src, PROC_REF(patient_insertion_check), target, source)))
+	if(!do_after(source || chassis, get_equip_cooldown(atomtarget), target, extra_checks=CALLBACK(src, PROC_REF(patient_insertion_check), target, source)))
 		return
 	if(!chassis || !(get_dir(chassis, target) & chassis.dir))
 		return
@@ -310,7 +310,7 @@
 	if(reagents.total_volume <= 0)
 		to_chat(source, "[icon2html(src, source)]<span class='alert'>No available reagents to load syringe with.</span>")
 		return
-	if(HAS_TRAIT(source, TRAIT_PACIFISM))
+	if(source && HAS_TRAIT(source, TRAIT_PACIFISM))
 		to_chat(source, span_alert("The [src] might be lethally chambered! You don't want to risk harming anyone..."))
 		return
 	var/obj/item/ammo_casing/syringegun/chambered = new /obj/item/ammo_casing/syringegun(src)

@@ -48,6 +48,10 @@
 	name = "Toggle Lights"
 	button_icon_state = "mech_lights_off"
 
+/datum/action/vehicle/sealed/mecha/mech_toggle_lights/set_chassis(passed_chassis)
+	. = ..()
+	RegisterSignal(chassis, COMSIG_MECH_LIGHTS_TOGGLE, PROC_REF(on_lights_toggled))
+
 /datum/action/vehicle/sealed/mecha/mech_toggle_lights/Trigger(mob/clicker, trigger_flags)
 	. = ..()
 	if(!.)
@@ -55,6 +59,12 @@
 	if(!chassis || !(owner in chassis.occupants))
 		return
 	chassis.toggle_lights(user = owner)
+
+/datum/action/vehicle/sealed/mecha/proc/on_lights_toggled(datum/source, lights_on)
+	SIGNAL_HANDLER
+	chassis.balloon_alert(owner, "lights [lights_on ? "on":"off"]")
+	button_icon_state = "mech_lights_[lights_on ? "on" : "off"]"
+	build_all_button_icons()
 
 /datum/action/vehicle/sealed/mecha/mech_view_stats
 	name = "View Stats"
@@ -98,6 +108,10 @@
 	name = "Toggle Strafing. Disabled when Alt is held."
 	button_icon_state = "strafe"
 
+/datum/action/vehicle/sealed/mecha/strafe/set_chassis(passed_chassis)
+	. = ..()
+	RegisterSignal(chassis, COMSIG_MECH_STRAFE_TOGGLE, PROC_REF(update_action_icon))
+
 /datum/action/vehicle/sealed/mecha/strafe/Trigger(mob/clicker, trigger_flags)
 	. = ..()
 	if(!.)
@@ -107,22 +121,9 @@
 
 	chassis.toggle_strafe()
 
-/obj/vehicle/sealed/mecha/proc/toggle_strafe()
-	if(!(mecha_flags & CAN_STRAFE))
-		to_chat(occupants, "this mecha doesn't support strafing!")
-		return
-
-	strafe = !strafe
-	set_dir_on_move = !strafe
-
-	for(var/mob/occupant in occupants)
-		balloon_alert(occupant, "strafing [strafe?"on":"off"]")
-		occupant.playsound_local(src, 'sound/machines/terminal/terminal_eject.ogg', 50, TRUE)
-	log_message("Toggled strafing mode [strafe?"on":"off"].", LOG_MECHA)
-
-	for(var/occupant in occupants)
-		var/datum/action/action = LAZYACCESSASSOC(occupant_actions, occupant, /datum/action/vehicle/sealed/mecha/strafe)
-		action?.build_all_button_icons()
+/datum/action/vehicle/sealed/mecha/strafe/proc/update_action_icon()
+	SIGNAL_HANDLER
+	build_all_button_icons()
 
 /// Swap seats, for two person mecha
 /datum/action/vehicle/sealed/mecha/swap_seat
@@ -164,9 +165,13 @@
 	desc = "Increases mech speed and power at the cost of heat generation."
 	button_icon_state = "mech_overload_off"
 
-/datum/action/vehicle/sealed/mecha/mech_overclock/siren/New()
+/datum/action/vehicle/sealed/mecha/mech_overclock/New()
 	. = ..()
 	build_all_button_icons()
+
+/datum/action/vehicle/sealed/mecha/mech_overclock/set_chassis(passed_chassis)
+	. = ..()
+	RegisterSignal(chassis, COMSIG_MECHA_TOGGLE_OVERCLOCK, PROC_REF(on_overclock))
 
 /datum/action/vehicle/sealed/mecha/mech_overclock/Trigger(mob/clicker, trigger_flags, forced_state = null)
 	. = ..()
@@ -175,7 +180,11 @@
 	if(!chassis || !(owner in chassis.occupants))
 		return
 	chassis.toggle_overclock(forced_state)
-	build_all_button_icons()
+
+/datum/action/vehicle/sealed/mecha/mech_overclock/proc/on_overclock(datum/source, overclock_mode)
+	SIGNAL_HANDLER
+	chassis.balloon_alert(owner, "[chassis.overclock_name] [overclock_mode ? "on":"off"]")
+	build_all_button_icons(UPDATE_BUTTON_ICON)
 
 /datum/action/vehicle/sealed/mecha/mech_overclock/apply_button_icon(atom/movable/screen/movable/action_button/current_button, force)
 	button_icon_state = get_button_icon_state()

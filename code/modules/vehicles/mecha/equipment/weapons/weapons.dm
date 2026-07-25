@@ -70,7 +70,7 @@
 		projectile_obj.log_override = TRUE //we log being fired ourselves a little further down.
 		projectile_obj.firer = chassis
 		projectile_obj.fired_from = src // mech = firer, equipment = fired from
-		projectile_obj.aim_projectile(target, source, modifiers, spread)
+		projectile_obj.aim_projectile(target, source || chassis, modifiers, spread)
 		if(isliving(source) && source.client) //dont want it to happen from syndie mecha npc mobs, they do direct fire anyways
 			var/mob/living/shooter = source
 			projectile_obj.hit_prone_targets = shooter.combat_mode
@@ -292,8 +292,9 @@
 	log_message("Honked from [src.name]. HONK!", LOG_MECHA)
 	var/turf/T = get_turf(src)
 	message_admins("[ADMIN_LOOKUPFLW(source)] used a Mecha Honker in [ADMIN_VERBOSEJMP(T)]")
-	source.log_message("used a Mecha Honker at [AREACOORD(T)].", LOG_GAME)
-	source.log_message("used a Mecha Honker at [AREACOORD(T)].", LOG_ATTACK)
+	var/atom/log_source = source || chassis
+	log_source.log_message("used a Mecha Honker at [AREACOORD(T)].", LOG_MECHA)
+	log_source.log_message("used a Mecha Honker at [AREACOORD(T)].", LOG_ATTACK)
 	return ..()
 
 
@@ -454,12 +455,12 @@
 	TIMER_COOLDOWN_START(chassis, COOLDOWN_MECHA_EQUIPMENT(type), get_equip_cooldown(target))
 	chassis.use_energy(energy_drain)
 	var/newtonian_target = dir2angle(REVERSE_DIR(chassis.dir))
-	var/obj/O = new projectile(chassis.loc)
+	var/obj/object = new projectile(chassis.loc)
 	playsound(chassis, fire_sound, 50, TRUE)
-	log_message("Launched a [O.name] from [name], targeting [target].", LOG_MECHA)
+	log_message("Launched a [object.name] from [name], targeting [target].", LOG_MECHA)
 	projectiles--
-	proj_init(O, source)
-	O.throw_at(target, missile_range, missile_speed, source, FALSE, diagonals_first = diags_first)
+	proj_init(object, source || chassis)
+	object.throw_at(target, missile_range, missile_speed, source, FALSE, diagonals_first = diags_first)
 	sleep(max(0, projectile_delay))
 	if(kickback)
 		chassis.newtonian_move(newtonian_target)

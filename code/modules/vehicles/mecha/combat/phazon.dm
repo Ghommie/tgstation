@@ -153,12 +153,11 @@
 	display_name = "Phase"
 	desc = "Used to toggle phasing."
 	required_mech_type = /obj/vehicle/sealed/mecha/phazon
-	var/datum/port/input/toggle
+	circuit_flags = CIRCUIT_FLAG_INPUT_SIGNAL
 	var/datum/port/output/phasing
 
 /obj/item/circuit_component/mecha/phase/populate_ports()
 	. = ..()
-	toggle = add_input_port("Toggle", PORT_TYPE_SIGNAL)
 	phasing = add_output_port("Phasing", PORT_TYPE_BOOLEAN)
 
 /obj/item/circuit_component/mecha/phase/register_shell(atom/movable/shell)
@@ -168,6 +167,10 @@
 /obj/item/circuit_component/mecha/phase/unregister_shell(atom/movable/shell)
 	UnregisterSignal(shell, COMSIG_MECHA_TOGGLE_PHASING)
 	return ..()
+
+/obj/item/circuit_component/mecha/phase/input_received(datum/port/input/port, list/return_values)
+	var/obj/vehicle/sealed/mecha/phazon/phazon = mech
+	phazon.toggle_phasing()
 
 /obj/item/circuit_component/mecha/phase/proc/on_phasing_toggled(datum/source, phasing_val)
 	SIGNAL_HANDLER

@@ -1259,11 +1259,12 @@
 	return TRUE
 
 /obj/machinery/door/airlock/try_to_crowbar(obj/item/tool, mob/living/user, forced = FALSE)
+	var/atom/crowbar_owner = tool?.loc || user // catches mechs and any other non-mob using a crowbar
 	if(!isnull(tool) && tool.tool_behaviour == TOOL_CROWBAR && should_try_removing_electronics() && !operating)
-		user.visible_message(span_notice("[user] removes the electronics from the airlock assembly."), \
+		crowbar_owner.visible_message(span_notice("[crowbar_owner] removes the electronics from the airlock assembly."), \
 			span_notice("You start to remove electronics from the airlock assembly..."))
 
-		if(tool.use_tool(src, user, 40, volume = 100))
+		if(tool.use_tool(src, crowbar_owner, 40, volume = 100))
 			deconstruct(TRUE, user)
 			return
 
@@ -1306,18 +1307,18 @@
 	playsound(src, 'sound/machines/airlock/airlock_alien_prying.ogg', 100, TRUE) //is it aliens or just the CE being a dick?
 	prying_so_hard = TRUE
 
-	if(!tool.use_tool(src, user, time_to_open, volume = 100))
+	if(!tool.use_tool(src, crowbar_owner, time_to_open, volume = 100))
 		prying_so_hard = FALSE
 		return
 
 	if(!isnull(tool))
-		if(SEND_SIGNAL(tool, COMSIG_TOOL_FORCE_OPEN_AIRLOCK, user, src) & COMPONENT_TOOL_DO_NOT_ALLOW_FORCE_OPEN)
+		if(SEND_SIGNAL(tool, COMSIG_TOOL_FORCE_OPEN_AIRLOCK, crowbar_owner, src) & COMPONENT_TOOL_DO_NOT_ALLOW_FORCE_OPEN)
 			prying_so_hard = FALSE
 			return
 
 	prying_so_hard = FALSE
 
-	if(check_electrified && shock(user, 100))
+	if(check_electrified && user && shock(user, 100))
 		return
 
 	open(BYPASS_DOOR_CHECKS)
